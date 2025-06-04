@@ -62,7 +62,11 @@ end
 
 local url = "DISCORD_WEBHOOK"  -- discord webhook (optional)
 
-if LocalPlayer and ToggleWebhook then
-    local playerName = LocalPlayer.Name
-    SendMessage(url, "the script has executed successfully\nCurrent User : " .. playerName .. "") -- the thing in quotation mark are the message the bot will send to, so change it
+while true do
+    if LocalPlayer then
+        if ToggleWebhook then
+        local playerName = LocalPlayer.Name
+        task.wait(120)
+        SendMessage(url, "the script has executed successfully\nCurrent User : " .. playerName .. "") -- the thing in quotation mark are the message the bot will send to, so change it
+    end
 end
