@@ -8,5 +8,5 @@ ToggleRandomKey = false -- executing the key randomly as u paste it on above
 ToggleWebhook = true -- turn on webhook or turn it off (false)
 -- webhook message : The script has executed successfully\nCurrent User : " .. playerName .. "
 
-loadstring(game:HttpGet"https://raw.githubusercontent.com/afkar-gg/Roblox-Scripts/refs/heads/main/Native/native.lua")
+loadstring(game:HttpGet"https://raw.githubusercontent.com/afkar-gg/Roblox-Scripts/refs/heads/main/Native/native.lua")();
 ```
