@@ -1,10 +1,3 @@
--- MNjiOvrRBKLhSzboSKWyJrrJBoQpvqek
-
-jjkloskl = "YOUR-NATIVE-KEY-HERE" -- your script key (https://getnative.cc/linkvertise)
-sukmadik = "YOUR-SECOND-KEY-HERE" -- you can put the key on above or paste another new native key
-
-coin_flip = math.random(0, 1) -- randomize key for evading blacklist (optional to do)
-
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
@@ -69,18 +62,20 @@ function SendMessageEMBED(url, embed)
 end
 
 
-local url = "YOUR-WEBHOOK HERE"  -- discord webhook (optional)
+local url = "DISCORD_WEBHOOK"  -- discord webhook (optional)
 
-
+coin_flip = math.random(0, 1) -- randomize key for evading blacklist (optional to do)
 if coin_flip == 0 then
-    script_key = jjkloskl;
-(loadstring or load)(game:HttpGet("https://getnative.cc/script/loader"))()
-else
-    script_key = sukmadik;
-(loadstring or load)(game:HttpGet("https://getnative.cc/script/loader"))()
+    if ToggleRandomKey then
+        script_key = put-key-here;
+    (loadstring or load)(game:HttpGet("https://getnative.cc/script/loader"))()
+    else
+        script_key = put-2key-here;
+    (loadstring or load)(game:HttpGet("https://getnative.cc/script/loader"))()
+    end
 end
 
-if LocalPlayer then
+if LocalPlayer and ToggleWebhook then
     local playerName = LocalPlayer.Name
     SendMessage(url, "the script has executed successfully\nCurrent User : " .. playerName .. "") -- the thing in quotation mark are the message the bot will send to, so change it
 end
