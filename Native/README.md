@@ -4,4 +4,4 @@ put-2key-here = "YOUR-SECOND-KEY-HERE" -- you can paste another key here
 ToggleRandomKey = false -- executing the key randomly as u paste it on above
 ToggleWebhook = true -- turn on webhook or turn it off (false)
 
-loadstring("github")
+loadstring(game:HttpGet"https://raw.githubusercontent.com/afkar-gg/Roblox-Scripts/refs/heads/main/Native/native.lua")
