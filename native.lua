@@ -1,8 +1,7 @@
--- inspect fully the SCRIPT!!
+-- MNjiOvrRBKLhSzboSKWyJrrJBoQpvqek
 
-print("afkar-gg on github")
-jjkloskl = "thescriptkey1" -- your script key (https://getnative.cc/linkvertise)
-sukmadik = "thescriptkey2" -- you can put the key on above or paste another new key
+jjkloskl = "YOUR-NATIVE-KEY-HERE" -- your script key (https://getnative.cc/linkvertise)
+sukmadik = "YOUR-SECOND-KEY-HERE" -- you can put the key on above or paste another new native key
 
 coin_flip = math.random(0, 1) -- randomize key for evading blacklist (optional to do)
 
@@ -70,9 +69,8 @@ function SendMessageEMBED(url, embed)
 end
 
 
-local url = "https://discord.com/api/webhooks/1379133663626662020/AXUUlu0lkieQ8BPD6gMVBYLJPwtefzw9Xifseli75ZhgRPxwTEroDmDpg-RCHyYCDBQX"  -- discord webhook (change before exec)
+local url = "YOUR-WEBHOOK HERE"  -- discord webhook (optional)
 
-SendMessage(url, "<@1339276821308375131>") -- the thing in quotation mark are the message the bot will send to, so change it
 
 if coin_flip == 0 then
     script_key = jjkloskl;
@@ -82,15 +80,7 @@ else
 (loadstring or load)(game:HttpGet("https://getnative.cc/script/loader"))()
 end
 
-local embed = {
-    ["title"] = "This is an embedded message",
-    ["description"] = "This message has an embed with fields and a footer",
-    ["color"] = 65280,
-    ["fields"] = {
-        {
-            ["name"] = "Current User : " ..playerName.. "",
-            ["value"] = "Current key : script_key"
-        },
-    },
-}
-SendMessageEMBED(url, embed)
+if LocalPlayer then
+    local playerName = LocalPlayer.Name
+    SendMessage(url, "the script has executed successfully\nCurrent User : " .. playerName .. "") -- the thing in quotation mark are the message the bot will send to, so change it
+end
