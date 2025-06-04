@@ -55,5 +55,7 @@ getgenv().Configs = {
         ["ShowInventoryPrice"] = false, -- true/false
     }
 }
+
 loadstring(game:HttpGet"https://raw.githubusercontent.com/afkar-gg/Roblox-Scripts/refs/heads/main/NatHub/NatHub.lua")();
+loadstring(game:HttpGet("https://get.nathub.xyz/loader"))();
 ```
