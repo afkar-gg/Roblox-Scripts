@@ -68,10 +68,10 @@ coin_flip = math.random(0, 1) -- randomize key for evading blacklist (optional t
 if coin_flip == 0 then
     if ToggleRandomKey then
         script_key = put-key-here;
-    (loadstring or load)(game:HttpGet("https://getnative.cc/script/loader"))()
+        (loadstring or load)(game:HttpGet("https://getnative.cc/script/loader"))()
     else
         script_key = put-2key-here;
-    (loadstring or load)(game:HttpGet("https://getnative.cc/script/loader"))()
+        (loadstring or load)(game:HttpGet("https://getnative.cc/script/loader"))()
     end
 end
 
