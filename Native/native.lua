@@ -66,13 +66,11 @@ local url = "DISCORD_WEBHOOK"  -- discord webhook (optional)
 
 coin_flip = math.random(0, 1) -- randomize key for evading blacklist (optional to do)
 if coin_flip == 0 then
-    if ToggleRandomKey then
-        script_key = put-key-here;
-        (loadstring or load)(game:HttpGet("https://getnative.cc/script/loader"))()
-    else
-        script_key = put-2key-here;
-        (loadstring or load)(game:HttpGet("https://getnative.cc/script/loader"))()
-    end
+    script_key = put-key-here;
+    (loadstring or load)(game:HttpGet("https://getnative.cc/script/loader"))()
+else
+    script_key = put-2key-here;
+    (loadstring or load)(game:HttpGet("https://getnative.cc/script/loader"))()
 end
 
 if LocalPlayer then
