@@ -75,13 +75,9 @@ if coin_flip == 0 then
     end
 end
 
-if LocalPlayer and ToggleWebhook then
+if LocalPlayer then
+    while true do
     local playerName = LocalPlayer.Name
+    task.wait(120)
     SendMessage(url, "the script has executed successfully\nCurrent User : " .. playerName .. "") -- the thing in quotation mark are the message the bot will send to, so change it
-    if OnLoop then
-        while true do
-            task.wait(120)
-            SendMessage(url, "the script has executed successfully\nCurrent User : " .. playerName .. "")
-        end
-    end
 end
