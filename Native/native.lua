@@ -69,10 +69,10 @@ local url = "dc"  -- discord webhook (optional)
 
 coin_flip = math.random(0, 1) -- randomize key for evading blacklist (optional to do)
 if coin_flip == 0 then
-    script_key = key;
+    script_key = "key";
     (loadstring or load)(game:HttpGet("https://getnative.cc/script/loader"))()
 else
-    script_key = 2key;
+    script_key = " 2key";
     (loadstring or load)(game:HttpGet("https://getnative.cc/script/loader"))()
 end
 
