@@ -1,5 +1,7 @@
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
+local key = "put-key-here"
+local 2key = "put-2key-here"
 
 if LocalPlayer then
     local playerName = LocalPlayer.Name
@@ -66,10 +68,10 @@ local url = "DISCORD_WEBHOOK"  -- discord webhook (optional)
 
 coin_flip = math.random(0, 1) -- randomize key for evading blacklist (optional to do)
 if coin_flip == 0 then
-    script_key = put-key-here;
+    script_key = key;
     (loadstring or load)(game:HttpGet("https://getnative.cc/script/loader"))()
 else
-    script_key = put-2key-here;
+    script_key = 2key;
     (loadstring or load)(game:HttpGet("https://getnative.cc/script/loader"))()
 end
 
