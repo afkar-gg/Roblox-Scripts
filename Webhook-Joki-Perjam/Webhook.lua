@@ -63,7 +63,7 @@ local embed = {
     ["fields"] = {
         {
             ["name"] = "Info Order",
-            ["value"] = "Nomor Order : " ..no_order.. "\nLink [Riwayat pesanan](https://tokoku.itemku.com/riwayat-pesanan/rincian/" ..new_string.. ")"
+            ["value"] = "Nomor Order : ``" ..no_order.. "``\nLink [Riwayat pesanan](https://tokoku.itemku.com/riwayat-pesanan/rincian/" ..new_string.. ")"
         },
         {
             ["name"] = "Info Joki",
