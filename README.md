@@ -1,6 +1,5 @@
 # My Roblox Exploit Scripts
-**Im showing my modified scripts that will do what i like to**
+**Random scripts but helpful for me and sone other (open source)**
 
 Current Modification :
-- [Native Hub](https://getnative.cc) Status : 🟢
-- [NatHub](https://get.nathub.xyz/) Status : 🟡 (wip)
+- Joki Webhook
