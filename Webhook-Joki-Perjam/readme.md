@@ -1,6 +1,6 @@
 ## Webhook Joki Perjam
-Script Khusus Penjoki yg menjual jasa joki afk/farm perjam dan malas ngitung 🗿
-Loadstring :
+### Script Khusus Penjoki yg menjual jasa joki afk/farm perjam dan malas ngitung 🗿
+~ Loadstring :
 ```lua
 local jam_selesai_joki = 1
 local webhook_discord = ""
