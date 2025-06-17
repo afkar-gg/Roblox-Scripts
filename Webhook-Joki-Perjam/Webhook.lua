@@ -44,7 +44,7 @@ function SendMessageEMBED(url, embed)
     }
     local body = http:JSONEncode(data)
     local response = request({
-        Url = url,
+        Url = webhook_discord,
         Method = "POST",
         Headers = headers,
         Body = body
@@ -55,7 +55,6 @@ end
 
 --Examples
 
-local url = "webhook_discord"
 
 local embed = {
     ["title"] = "JOKI DIMULAI",
