@@ -1,3 +1,4 @@
+
 local Players = game:GetService("Players") -- Get the Players service
 local LocalPlayer = Players.LocalPlayer -- Get the local player (the client playing the game)
 local username = LocalPlayer.Name -- Get the player's username
@@ -62,7 +63,7 @@ end
 
 local embed = {
     ["title"] = "JOKI DIMULAI",
-    ["description"] = "Username : ||" .. username .. "||", -- Concatenate "Username : " with the username variable
+    ["description"] = "Username : ||" ..username.. "||", -- Concatenate "Username : " with the username variable
     ["color"] = 65280,
     ["fields"] = {
         {
