@@ -1,12 +1,13 @@
+
 local Players = game:GetService("Players") -- Get the Players service
 local LocalPlayer = Players.LocalPlayer -- Get the local player (the client playing the game)
 local username = LocalPlayer.Name -- Get the player's username
 
--- 1. Define start and end times clearly using UTC Unix timestamps, which Discord prefers.
-local start_timestamp = os.time()
-local end_timestamp = start_timestamp + (3600 * jam_selesai_joki)
+local current_time = os.time()
+local wib = current_time + 25200
+local done_joki = wib + 3600 * jam_selesai_joki
 
--- This part is correct.
+
 local new_string = string.sub(no_order, 9) -- Start from the 9th character to get the numbers after "OD000000"
 
 
@@ -28,8 +29,6 @@ function SendMessage(url, message)
     print("Sent")
 end
 
--- This function has not been changed, as requested.
--- In Webhook.lua (Corrected)
 function SendMessageEMBED(url, embed)
     local http = game:GetService("HttpService")
     local headers = {
@@ -48,29 +47,36 @@ function SendMessageEMBED(url, embed)
             }
         }
     }
-    
-    -- Encode the data table into a JSON string
-    local success, body = pcall(function()
-        return http:JSONEncode(data)
-    end)
-
-    if not success then
-        warn("Failed to encode JSON body:", body)
-        return
-    end
-
-    -- Use HttpService:PostAsync in a protected call
-    local success, response = pcall(function()
-        return http:PostAsync(url, body, Enum.HttpContentType.ApplicationJson)
-    end)
-
-    if success then
-        print("Webhook message sent successfully.")
-    else
-        warn("Failed to send webhook message:", response)
-    end
+    local body = http:JSONEncode(data)
+    local response = request({
+        Url = discord_webhook,
+        Method = "POST",
+        Headers = headers,
+        Body = body
+    })
+    print("Sent")
 end
 
 
--- 3. Fixed the function call to use the correct 'discord_webhook' variable.
+--Examples
+
+
+local embed = {
+    ["title"] = "JOKI DIMULAI",
+    ["description"] = "Username : " .. username.. "", -- Concatenate "Username : " with the username variable
+    ["color"] = 65280,
+    ["fields"] = {
+        {
+            ["name"] = "Info Order",
+            ["value"] = "Nomor Order : " ..no_order.. "\nLink [Riwayat pesanan](https://tokoku.itemku.com/riwayat-pesanan/rincian/" ..new_string.. ")"
+        },
+        {
+            ["name"] = "Info Joki",
+            ["value"] = "Waktu joki dimulai : <t:" ..os.time().. ":f> \nWaktu joki selesai : <t:" .. os.time() .. ":f>"
+        }
+    },
+    ["footer"] = {
+        ["text"] = "- " ..nama_store.. " ❤️"
+    }
+}
 SendMessageEMBED(discord_webhook, embed)
