@@ -2,4 +2,4 @@
 **Random scripts but helpful for me and sone other (open source)**
 
 Current Modification :
-- Webhook Utk Joki Perjam
+- Webhook For Joki Perjam
