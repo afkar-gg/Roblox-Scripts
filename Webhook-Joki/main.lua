@@ -153,7 +153,7 @@ executeButton.MouseButton1Click:Connect(function()
     ]], jam_selesai_joki_val, discord_webhook_val, no_order_val, nama_store_val)
 
     -- Combine the user-defined variables with the remote script loader
-    local fullScript = codeToExecute .. '\nloadstring(game:HttpGet("https://raw.githubusercontent.com/afkar-gg/Roblox-Scripts/refs/heads/main/Webhook-Joki-Perjam/Webhook.lua"))();'
+    local fullScript = codeToExecute .. '\nloadstring(game:HttpGet("https://raw.githubusercontent.com/afkar-gg/Roblox-Scripts/refs/heads/main/Webhook-Joki/Webhook.lua"))();'
     
     -- Execute the combined script
     local success, err = pcall(function()
