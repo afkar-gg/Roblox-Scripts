@@ -1,6 +1,7 @@
 --[[
-    All-in-One UI Script for Webhook Execution
+    All-in-One UI Script for Webhook Execution (v2)
     - Creates a UI to input custom values.
+    - Features: Draggable window, text wrapping, close button.
     - Fetches a remote script, injects the custom values, and executes it.
 ]]
 
@@ -29,11 +30,11 @@ screenGui.ResetOnSpawn = false
 screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
 screenGui.Parent = game:GetService("CoreGui")
 
--- Main Frame (the window)
+-- Main Frame (the window) - Increased height from 300 to 350
 local mainFrame = Instance.new("Frame")
 mainFrame.Name = "MainFrame"
-mainFrame.Size = UDim2.new(0, 400, 0, 300)
-mainFrame.Position = UDim2.new(0.5, -200, 0.5, -150)
+mainFrame.Size = UDim2.new(0, 400, 0, 350) -- Taller UI
+mainFrame.Position = UDim2.new(0.5, -200, 0.5, -175)
 mainFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
 mainFrame.BorderColor3 = Color3.fromRGB(85, 85, 105)
 mainFrame.BorderSizePixel = 2
@@ -63,12 +64,41 @@ local titleCorner = Instance.new("UICorner")
 titleCorner.CornerRadius = UDim.new(0, 8)
 titleCorner.Parent = titleLabel
 
+-- [NEW] Close Button (X)
+local closeButton = Instance.new("TextButton")
+closeButton.Name = "CloseButton"
+closeButton.Size = UDim2.new(0, 22, 0, 22)
+closeButton.Position = UDim2.new(1, -16, 0.5, 0)
+closeButton.AnchorPoint = Vector2.new(1, 0.5)
+closeButton.BackgroundColor3 = Color3.fromRGB(231, 76, 60)
+closeButton.Text = "X"
+closeButton.Font = Enum.Font.SourceSansBold
+closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeButton.TextSize = 14
+closeButton.Parent = titleLabel
+
+local closeCorner = Instance.new("UICorner")
+closeCorner.CornerRadius = UDim.new(0, 6)
+closeCorner.Parent = closeButton
+
+-- [NEW] Close button functionality
+closeButton.MouseButton1Click:Connect(function()
+    screenGui.Enabled = false
+end)
+
+
 -- UIListLayout to automatically stack elements
 local listLayout = Instance.new("UIListLayout")
-listLayout.Padding = UDim.new(0, 10)
+listLayout.Padding = UDim.new(0, 8)
 listLayout.SortOrder = Enum.SortOrder.LayoutOrder
 listLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 listLayout.Parent = mainFrame
+
+-- Add padding to push content below the title bar
+local uiPadding = Instance.new("UIPadding")
+uiPadding.PaddingTop = UDim.new(0, 35)
+uiPadding.Parent = mainFrame
+
 
 -- Helper function to create a labeled textbox
 local function createLabeledInput(name, placeholder, order, isNumber)
@@ -103,6 +133,7 @@ local function createLabeledInput(name, placeholder, order, isNumber)
     textbox.TextColor3 = Color3.fromRGB(255, 255, 255)
     textbox.TextSize = 14
     textbox.ClearTextOnFocus = false
+    textbox.TextWrapped = true -- [NEW] Added text wrapping
     if isNumber then
         textbox.Text = "1" -- Default value
     end
@@ -185,9 +216,6 @@ executeButton.MouseButton1Click:Connect(function()
     end
 
     -- Construct the final script by prepending the user-defined variables
-    -- We use string.format to safely inject the values.
-    -- %q will automatically add quotes and escape characters for the strings.
-    -- %s is used for the number, which doesn't need quotes.
     local finalScript = string.format([[
         -- Variables injected by the UI script
         local jam_selesai_joki = %s
@@ -208,8 +236,6 @@ executeButton.MouseButton1Click:Connect(function()
         executeButton.Text = "SUCCESS!"
         executeButton.BackgroundColor3 = Color3.fromRGB(87, 242, 135) -- Green
         wait(2)
-        -- Optional: Close the UI on success
-        -- screenGui:Destroy()
     else
         executeButton.Text = "EXECUTION ERROR"
         executeButton.BackgroundColor3 = Color3.fromRGB(237, 66, 69) -- Red
@@ -222,3 +248,4 @@ executeButton.MouseButton1Click:Connect(function()
     executeButton.Text = "EXECUTE SCRIPT"
     executeButton.BackgroundColor3 = Color3.fromRGB(88, 101, 242)
 end)
+
