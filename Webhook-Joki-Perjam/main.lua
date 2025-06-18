@@ -2,7 +2,7 @@
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "MovableEditableUI"
 ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
-ScreenGui.ResetOnSpawn = false
+ScreenGui.ResetOnSpawn = false -- Keeps the UI visible after character respawns
 
 -- Main Frame for the UI (this will be draggable)
 local MainFrame = Instance.new("Frame")
@@ -49,7 +49,7 @@ ToggleButton.MouseButton1Click:Connect(function()
     MainFrame.Visible = not MainFrame.Visible -- Toggle visibility
 end)
 
--- Local Variables (initial values)
+-- Local Variables (initial values - these will be updated from TextBoxes)
 local jam_selesai_joki = 1
 local webhook_discord = "YOUR_WEBHOOK_URL_HERE" -- **REMEMBER TO REPLACE THIS WITH YOUR ACTUAL WEBHOOK URL**
 local no_order = "OD000000141403135"
@@ -95,8 +95,8 @@ local NamaStoreInput = createInputPair(MainFrame, 140, "Nama Store", nama_store)
 local SaveButton = Instance.new("TextButton")
 SaveButton.Name = "SaveButton"
 SaveButton.Size = UDim2.new(1, -20, 0, 40)
-SaveButton.Position = UDim2.new(0, 10, 0, 190)
-SaveButton.BackgroundColor3 = Color3.fromRGB(50, 150, 50)
+SaveButton.Position = UDim2.new(0, 10, 0, 190) -- Position below inputs
+SaveButton.BackgroundColor3 = Color3.fromRGB(50, 150, 50) -- Greenish color
 SaveButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 SaveButton.Font = Enum.Font.SourceSansBold
 SaveButton.TextSize = 18
@@ -104,14 +104,39 @@ SaveButton.Text = "Save Changes"
 SaveButton.Parent = MainFrame
 
 -- Event for the Save Changes button
--- In your UI Script (LocalScript in StarterPlayerScripts)
--- Only the ExecuteButton.MouseButton1Click part is shown, the rest of your UI script stays the same.
+SaveButton.MouseButton1Click:Connect(function()
+    local newJamSelesaiJoki = tonumber(JamSelesaiJokiInput.Text)
+    if newJamSelesaiJoki and newJamSelesaiJoki >= 0 then
+        jam_selesai_joki = newJamSelesaiJoki
+    else
+        warn("UI Script: Invalid input for 'Jam Selesai Joki'. Please enter a valid number.")
+        JamSelesaiJokiInput.Text = tostring(jam_selesai_joki) -- Revert to last valid
+    end
 
--- ... (your existing UI setup code above this) ...
+    webhook_discord = WebhookDiscordInput.Text
+    no_order = NoOrderInput.Text
+    nama_store = NamaStoreInput.Text
+
+    print("UI Script: Variables updated from UI:")
+    print("  Jam Selesai Joki:", jam_selesai_joki)
+    print("  Webhook Discord:", webhook_discord)
+    print("  No. Order:", no_order)
+    print("  Nama Store:", nama_store)
+end)
 
 -- Button to execute the loadstring code
--- ... (ExecuteButton creation code) ...
+local ExecuteButton = Instance.new("TextButton")
+ExecuteButton.Name = "ExecuteButton"
+ExecuteButton.Size = UDim2.new(1, -20, 0, 40)
+ExecuteButton.Position = UDim2.new(0, 10, 0, 240) -- Position below Save button
+ExecuteButton.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
+ExecuteButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+ExecuteButton.Font = Enum.Font.SourceSansBold
+ExecuteButton.TextSize = 18
+ExecuteButton.Text = "Execute Webhook Script"
+ExecuteButton.Parent = MainFrame
 
+-- Event for the Execute button click (with detailed debugging)
 ExecuteButton.MouseButton1Click:Connect(function()
     print("UI Script: Button clicked. Starting webhook execution process.") -- Debug 1: Confirm button click
 
@@ -179,26 +204,6 @@ ExecuteButton.MouseButton1Click:Connect(function()
         warn("UI Script: This is unexpected if loadstring didn't error. Check console for previous `loadstring` errors.")
     end
     print("UI Script: End of button click logic.") -- Debug 11: End of script
-end)
-
-
--- Button to execute the loadstring code
-local ExecuteButton = Instance.new("TextButton")
-ExecuteButton.Name = "ExecuteButton"
-ExecuteButton.Size = UDim2.new(1, -20, 0, 40)
-ExecuteButton.Position = UDim2.new(0, 10, 0, 240)
-ExecuteButton.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
-ExecuteButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-ExecuteButton.Font = Enum.Font.SourceSansBold
-ExecuteButton.TextSize = 18
-ExecuteButton.Text = "Execute Webhook Script"
-ExecuteButton.Parent = MainFrame
-
--- Event for the button click
-ExecuteButton.MouseButton1Click:Connect(function()
-    warn("Executing loadstring code...")
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/afkar-gg/Roblox-Scripts/refs/heads/main/Webhook-Joki-Perjam/Webhook.lua"))();
-    print("Loadstring executed!")
 end)
 
 print("Movable Editable UI loaded successfully!")
