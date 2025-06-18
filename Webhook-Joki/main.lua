@@ -1,176 +1,224 @@
 --[[
-    All-in-One UI and Executor Script
-    Creates a UI to input settings and then executes the main joki webhook script.
+    All-in-One UI Script for Webhook Execution
+    - Creates a UI to input custom values.
+    - Fetches a remote script, injects the custom values, and executes it.
 ]]
 
--- Create the ScreenGui to hold all UI elements
-local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "JokiExecutorUI"
-screenGui.ResetOnSpawn = false
-screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+-- Prevent the script from running in the command bar or on the server
+if not game:IsLoaded() then
+    game.Loaded:Wait()
+end
+if not game:GetService("Players").LocalPlayer then
+    warn("This script must be run from a client executor.")
+    return
+end
 
--- Create the main frame for the UI
+-- =================================================================
+-- UI CREATION
+-- =================================================================
+
+-- Clean up any previous UI with the same name
+pcall(function()
+    game:GetService("CoreGui"):FindFirstChild("JokiWebhookUI_ScreenGui"):Destroy()
+end)
+
+-- Main ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "JokiWebhookUI_ScreenGui"
+screenGui.ResetOnSpawn = false
+screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
+screenGui.Parent = game:GetService("CoreGui")
+
+-- Main Frame (the window)
 local mainFrame = Instance.new("Frame")
 mainFrame.Name = "MainFrame"
-mainFrame.Size = UDim2.new(0, 400, 0, 320)
-mainFrame.Position = UDim2.new(0.5, -200, 0.5, -160)
-mainFrame.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-mainFrame.BorderColor3 = Color3.fromRGB(25, 25, 25)
+mainFrame.Size = UDim2.new(0, 400, 0, 300)
+mainFrame.Position = UDim2.new(0.5, -200, 0.5, -150)
+mainFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
+mainFrame.BorderColor3 = Color3.fromRGB(85, 85, 105)
 mainFrame.BorderSizePixel = 2
 mainFrame.Active = true
 mainFrame.Draggable = true
 mainFrame.Parent = screenGui
 
--- Create a title label
+-- Add a corner radius to the frame
+local frameCorner = Instance.new("UICorner")
+frameCorner.CornerRadius = UDim.new(0, 8)
+frameCorner.Parent = mainFrame
+
+-- Title Label
 local titleLabel = Instance.new("TextLabel")
 titleLabel.Name = "TitleLabel"
-titleLabel.Size = UDim2.new(1, 0, 0, 40)
-titleLabel.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-titleLabel.BorderColor3 = Color3.fromRGB(25, 25, 25)
-titleLabel.Text = "Joki Executor Settings"
+titleLabel.Size = UDim2.new(1, 0, 0, 30)
+titleLabel.BackgroundColor3 = Color3.fromRGB(45, 45, 55)
+titleLabel.BorderColor3 = Color3.fromRGB(85, 85, 105)
+titleLabel.BorderSizePixel = 1
+titleLabel.Text = "Webhook Joki Configuration"
 titleLabel.Font = Enum.Font.SourceSansBold
-titleLabel.TextSize = 20
 titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+titleLabel.TextSize = 16
 titleLabel.Parent = mainFrame
 
--- Function to create a labeled textbox
-local function createLabeledTextBox(parent, yPosition, labelText, placeholderText, initialText)
+local titleCorner = Instance.new("UICorner")
+titleCorner.CornerRadius = UDim.new(0, 8)
+titleCorner.Parent = titleLabel
+
+-- UIListLayout to automatically stack elements
+local listLayout = Instance.new("UIListLayout")
+listLayout.Padding = UDim.new(0, 10)
+listLayout.SortOrder = Enum.SortOrder.LayoutOrder
+listLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+listLayout.Parent = mainFrame
+
+-- Helper function to create a labeled textbox
+local function createLabeledInput(name, placeholder, order, isNumber)
+    local container = Instance.new("Frame")
+    container.Name = name .. "Container"
+    container.Size = UDim2.new(0.9, 0, 0, 50)
+    container.BackgroundTransparency = 1
+    container.LayoutOrder = order
+    container.Parent = mainFrame
+
     local label = Instance.new("TextLabel")
-    label.Name = labelText .. "Label"
-    label.Size = UDim2.new(0, 120, 0, 30)
-    label.Position = UDim2.new(0, 10, 0, yPosition)
-    label.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+    label.Name = name .. "Label"
+    label.Size = UDim2.new(1, 0, 0, 20)
     label.BackgroundTransparency = 1
+    label.Text = name
     label.Font = Enum.Font.SourceSans
-    label.Text = labelText .. " :"
     label.TextColor3 = Color3.fromRGB(220, 220, 220)
-    label.TextSize = 18
+    label.TextSize = 14
     label.TextXAlignment = Enum.TextXAlignment.Left
-    label.Parent = parent
+    label.Parent = container
 
     local textbox = Instance.new("TextBox")
-    textbox.Name = labelText .. "TextBox"
-    textbox.Size = UDim2.new(1, -140, 0, 30)
-    textbox.Position = UDim2.new(0, 130, 0, yPosition)
-    textbox.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-    textbox.BorderColor3 = Color3.fromRGB(25, 25, 25)
+    textbox.Name = name .. "Box"
+    textbox.Size = UDim2.new(1, 0, 0, 30)
+    textbox.Position = UDim2.new(0, 0, 0, 20)
+    textbox.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+    textbox.BorderColor3 = Color3.fromRGB(85, 85, 105)
+    textbox.BorderSizePixel = 1
     textbox.Font = Enum.Font.SourceSans
-    textbox.Text = initialText or ""
-    textbox.PlaceholderText = placeholderText
+    textbox.PlaceholderText = placeholder
+    textbox.Text = ""
     textbox.TextColor3 = Color3.fromRGB(255, 255, 255)
-    textbox.TextSize = 16
+    textbox.TextSize = 14
     textbox.ClearTextOnFocus = false
-    textbox.Parent = parent
+    if isNumber then
+        textbox.Text = "1" -- Default value
+    end
+    textbox.Parent = container
+    
+    local textCorner = Instance.new("UICorner")
+    textCorner.CornerRadius = UDim.new(0, 4)
+    textCorner.Parent = textbox
 
     return textbox
 end
 
 -- Create the input fields using the helper function
-local jamSelesaiBox = createLabeledTextBox(mainFrame, 50, "Jam Selesai", "e.g., 1", "1")
-local webhookBox = createLabeledTextBox(mainFrame, 90, "Discord Webhook", "Your webhook URL here", "discord webhook here")
-local orderBox = createLabeledTextBox(mainFrame, 130, "No. Order", "e.g., OD000000141403135", "OD000000141403135")
-local storeNameBox = createLabeledTextBox(mainFrame, 170, "Nama Store", "Your store name", "AfkarStore")
+local jamSelesaiBox = createLabeledInput("jam_selesai_joki", "e.g., 1", 1, true)
+local webhookBox = createLabeledInput("discord_webhook", "Paste your Discord Webhook URL here", 2, false)
+local orderBox = createLabeledInput("no_order", "e.g., OD000000141403135", 3, false)
+local storeNameBox = createLabeledInput("nama_store", "e.g., AfkarStore", 4, false)
 
--- Create the execute button
+-- Execute Button
 local executeButton = Instance.new("TextButton")
 executeButton.Name = "ExecuteButton"
-executeButton.Size = UDim2.new(1, -20, 0, 40)
-executeButton.Position = UDim2.new(0, 10, 1, -50)
-executeButton.BackgroundColor3 = Color3.fromRGB(80, 165, 80)
-executeButton.BorderColor3 = Color3.fromRGB(25, 25, 25)
+executeButton.Size = UDim2.new(0.9, 0, 0, 40)
+executeButton.BackgroundColor3 = Color3.fromRGB(88, 101, 242) -- Discord Blurple
+executeButton.BorderColor3 = Color3.fromRGB(120, 130, 255)
+executeButton.BorderSizePixel = 1
+executeButton.Text = "EXECUTE SCRIPT"
 executeButton.Font = Enum.Font.SourceSansBold
-executeButton.Text = "EXECUTE"
 executeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-executeButton.TextSize = 20
+executeButton.TextSize = 18
+executeButton.LayoutOrder = 5
 executeButton.Parent = mainFrame
 
--- Create a status label
-local statusLabel = Instance.new("TextLabel")
-statusLabel.Name = "StatusLabel"
-statusLabel.Size = UDim2.new(1, -20, 0, 30)
-statusLabel.Position = UDim2.new(0, 10, 0, 220)
-statusLabel.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-statusLabel.BackgroundTransparency = 1
-statusLabel.Font = Enum.Font.SourceSansItalic
-statusLabel.Text = "Status: Idle"
-statusLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
-statusLabel.TextSize = 16
-statusLabel.TextXAlignment = Enum.TextXAlignment.Left
-statusLabel.Parent = mainFrame
+local buttonCorner = Instance.new("UICorner")
+buttonCorner.CornerRadius = UDim.new(0, 6)
+buttonCorner.Parent = executeButton
 
--- Create a close button
-local closeButton = Instance.new("TextButton")
-closeButton.Name = "CloseButton"
-closeButton.Size = UDim2.new(0, 30, 0, 30)
-closeButton.Position = UDim2.new(1, -35, 0, 5)
-closeButton.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-closeButton.Font = Enum.Font.SourceSansBold
-closeButton.Text = "X"
-closeButton.TextColor3 = Color3.fromRGB(200, 200, 200)
-closeButton.TextSize = 20
-closeButton.Parent = mainFrame
 
--- Event handlers
+-- =================================================================
+-- BUTTON LOGIC
+-- =================================================================
 
--- Close button logic
-closeButton.MouseButton1Click:Connect(function()
-    screenGui:Destroy()
-end)
-
--- Main execution logic
 executeButton.MouseButton1Click:Connect(function()
-    -- Get the values from the textboxes
-    local jam_selesai_joki_val = tonumber(jamSelesaiBox.Text) or 1
-    local discord_webhook_val = webhookBox.Text
-    local no_order_val = orderBox.Text
-    local nama_store_val = storeNameBox.Text
+    -- Get values from textboxes
+    local jamSelesai = tonumber(jamSelesaiBox.Text) or 1 -- Default to 1 if input is not a valid number
+    local webhookUrl = webhookBox.Text
+    local orderId = orderBox.Text
+    local storeName = storeNameBox.Text
 
     -- Basic validation
-    if not discord_webhook_val or not string.match(discord_webhook_val, "https://discord.com/api/webhooks/") then
-        statusLabel.Text = "Status: Error - Invalid Discord Webhook URL."
-        statusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
+    if webhookUrl == "" or orderId == "" or storeName == "" then
+        executeButton.Text = "PLEASE FILL ALL FIELDS"
+        executeButton.BackgroundColor3 = Color3.fromRGB(237, 66, 69) -- Red
+        wait(2)
+        executeButton.Text = "EXECUTE SCRIPT"
+        executeButton.BackgroundColor3 = Color3.fromRGB(88, 101, 242) -- Restore original color
         return
     end
-    if no_order_val == "" or nama_store_val == "" then
-        statusLabel.Text = "Status: Error - Order Number and Store Name cannot be empty."
-        statusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
-        return
-    end
 
-    statusLabel.Text = "Status: Executing script..."
-    statusLabel.TextColor3 = Color3.fromRGB(255, 255, 100)
-
-    -- Construct the code to be executed as a string
-    -- This string declares the variables with the user's input and then appends the HttpGet loadstring
-    local codeToExecute = string.format([[
-        local jam_selesai_joki = %d
-        local discord_webhook = "%s"
-        local no_order = "%s"
-        local nama_store = "%s"
-
-        -- The rest of your script from GitHub will be loaded and executed below
-        -- and will have access to the local variables defined above.
-    ]], jam_selesai_joki_val, discord_webhook_val, no_order_val, nama_store_val)
-
-    -- Combine the user-defined variables with the remote script loader
-    local fullScript = codeToExecute .. '\nloadstring(game:HttpGet("https://raw.githubusercontent.com/afkar-gg/Roblox-Scripts/refs/heads/main/Webhook-Joki/Webhook.lua"))();'
+    -- Provide feedback to the user
+    executeButton.Active = false
+    executeButton.Text = "EXECUTING..."
+    executeButton.BackgroundColor3 = Color3.fromRGB(80, 80, 90)
     
-    -- Execute the combined script
-    local success, err = pcall(function()
-        local func = loadstring(fullScript)
-        func()
+    local remoteScriptUrl = "https://raw.githubusercontent.com/afkar-gg/Roblox-Scripts/refs/heads/main/Webhook-Joki/Webhook.lua"
+
+    -- Fetch the remote script content
+    local success, remoteContent = pcall(function()
+        return game:HttpGet(remoteScriptUrl)
     end)
 
-    if success then
-        statusLabel.Text = "Status: Script executed successfully!"
-        statusLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
-        wait(2)
-        screenGui:Destroy() -- Optional: close the UI on success
-    else
-        statusLabel.Text = "Status: Execution failed! Check output for errors."
-        statusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
-        warn("Execution Error:", err)
+    if not success or not remoteContent then
+        executeButton.Text = "HTTP GET FAILED"
+        executeButton.BackgroundColor3 = Color3.fromRGB(237, 66, 69) -- Red
+        warn("Failed to fetch remote script:", remoteContent)
+        wait(3)
+        executeButton.Active = true
+        executeButton.Text = "EXECUTE SCRIPT"
+        executeButton.BackgroundColor3 = Color3.fromRGB(88, 101, 242)
+        return
     end
-end)
 
-print("Joki Executor UI Loaded. GUI created by Gemini.")
+    -- Construct the final script by prepending the user-defined variables
+    -- We use string.format to safely inject the values.
+    -- %q will automatically add quotes and escape characters for the strings.
+    -- %s is used for the number, which doesn't need quotes.
+    local finalScript = string.format([[
+        -- Variables injected by the UI script
+        local jam_selesai_joki = %s
+        local discord_webhook = %q
+        local no_order = %q
+        local nama_store = %q
+
+        -- Original remote script content begins here
+        %s
+    ]], jamSelesai, webhookUrl, orderId, storeName, remoteContent)
+    
+    -- Execute the combined script using loadstring
+    local loadSuccess, loadError = pcall(function()
+        loadstring(finalScript)()
+    end)
+    
+    if loadSuccess then
+        executeButton.Text = "SUCCESS!"
+        executeButton.BackgroundColor3 = Color3.fromRGB(87, 242, 135) -- Green
+        wait(2)
+        -- Optional: Close the UI on success
+        -- screenGui:Destroy()
+    else
+        executeButton.Text = "EXECUTION ERROR"
+        executeButton.BackgroundColor3 = Color3.fromRGB(237, 66, 69) -- Red
+        warn("Error during loadstring execution:", loadError)
+        wait(3)
+    end
+    
+    -- Reset the button state
+    executeButton.Active = true
+    executeButton.Text = "EXECUTE SCRIPT"
+    executeButton.BackgroundColor3 = Color3.fromRGB(88, 101, 242)
+end)
