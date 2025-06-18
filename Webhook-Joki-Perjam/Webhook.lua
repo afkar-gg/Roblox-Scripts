@@ -29,7 +29,7 @@ function SendMessage(url, message)
 end
 
 -- This function has not been changed, as requested.
-function SendMessageEMBED(url, embed)
+function SendMessageEMBED(discord_webhook, embed)
     local http = game:GetService("HttpService")
     local headers = {
         ["Content-Type"] = "application/json"
