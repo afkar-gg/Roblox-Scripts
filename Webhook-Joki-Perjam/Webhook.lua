@@ -72,7 +72,7 @@ local embed = {
         },
         {
             ["name"] = "Info Joki",
-            ["value"] = "Waktu joki dimulai : <t:" ..os.time().. ":f> \nWaktu joki selesai : <t:" .. os.time() ..":f>
+            ["value"] = "Waktu joki dimulai : <t:" ..os.time().. ":f> \nWaktu joki selesai : <t:" ..os.time() * done_joki..":f>
         }
     },
     ["footer"] = {
