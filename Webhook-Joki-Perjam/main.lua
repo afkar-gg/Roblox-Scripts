@@ -139,7 +139,7 @@ executeButton.MouseButton1Click:Connect(function()
     end
 
     -- 2. Define the remote script URL
-    local scriptUrl = "https://raw.githubusercontent.com/afkar-gg/Roblox-Scripts/bb7435548ccad9abe621f4af400b8d14fc0b0d09/Webhook-Joki-Perjam/Webhook.lua"
+    local scriptUrl = "https://raw.githubusercontent.com/afkar-gg/Roblox-Scripts/Webhook-Joki-Perjam/Webhook.lua"
 
     -- 3. Construct the full script
     local scriptToExecute = string.format([[
