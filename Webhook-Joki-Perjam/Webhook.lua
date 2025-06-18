@@ -12,32 +12,27 @@ return function(
     local LocalPlayer = Players.LocalPlayer -- This will be valid on the client (LocalScript context)
 
     -- Assign the passed arguments to local variables within this script's scope
-    -- This makes them accessible for calculations and webhook content
     local webhook_discord = passed_webhook_discord
     local jam_selesai_joki = passed_jam_selesai_joki
     local no_order = passed_no_order
     local nama_store = passed_nama_store
 
     -- === Input Validation and Defaults ===
-    -- Ensure jam_selesai_joki is a valid number, default to 1 if not
     if type(jam_selesai_joki) ~= "number" or jam_selesai_joki < 0 then
         warn("Invalid or missing 'jam_selesai_joki'. Defaulting to 1.")
         jam_selesai_joki = 1
     end
-    -- Ensure no_order is a string, default if empty
     if type(no_order) ~= "string" or no_order == "" then
         warn("Invalid or missing 'no_order'. Defaulting to 'N/A'.")
         no_order = "N/A"
     end
-    -- Ensure nama_store is a string, default if empty
     if type(nama_store) ~= "string" or nama_store == "" then
         warn("Invalid or missing 'nama_store'. Defaulting to 'Default Store'.")
         nama_store = "Default Store"
     end
-    -- Ensure webhook_discord is a string and looks like a URL
     if type(webhook_discord) ~= "string" or not webhook_discord:match("^https?://discord%.com/api/webhooks/%d+/%w+$") then
         warn("Invalid or missing 'webhook_discord' URL. Webhook will not be sent.")
-        webhook_discord = "" -- Clear it to prevent sending to a bad URL
+        webhook_discord = ""
     end
 
 
@@ -45,17 +40,13 @@ return function(
     local current_time = os.time()
     local wib_offset = 25200 -- UTC+7 (WIB - Western Indonesian Time) in seconds
     local wib_current_time = current_time + wib_offset
-
-    -- Calculate done_joki correctly using the now-validated jam_selesai_joki
     local done_joki = wib_current_time + (3600 * jam_selesai_joki)
 
-    -- Extract part of the order number for the link
-    local new_string = string.sub(no_order, 9) -- Start from the 9th character
+    local new_string = string.sub(no_order, 9)
 
-    -- Get username (handle cases where LocalPlayer might not be available, though it should be here)
     local username = LocalPlayer and LocalPlayer.Name or "UnknownUser"
 
-    -- === Webhook Sending Functions (Using HttpService:PostAsync) ===
+    -- === Webhook Sending Functions ===
 
     -- Original SendMessage function, fixed to use HttpService:PostAsync
     function SendMessage(url, message)
@@ -64,7 +55,7 @@ return function(
             return
         end
 
-        local http = HttpService -- Use the HttpService from the outer scope
+        local http = HttpService
         local headers = {
             ["Content-Type"] = "application/json"
         }
@@ -74,7 +65,7 @@ return function(
         local body = http:JSONEncode(data)
 
         local success, response = pcall(function()
-            return http:PostAsync(url, body, true) -- Send to the 'url' parameter
+            return http:PostAsync(url, body, true)
         end)
 
         if success then
@@ -84,8 +75,8 @@ return function(
         end
     end
 
-    -- Original SendMessageEMBED function, fixed to use HttpService:PostAsync
-    function SendMessageEMBED(url, embed) -- Original parameter names
+    -- SendMessageEMBED function with original signature, but fixed to work in Roblox
+    function SendMessageEMBED(url, embed)
         if type(url) ~= "string" or url == "" then
             warn("SendMessageEMBED: Provided URL is invalid or empty. Not sending.")
             return
@@ -96,13 +87,24 @@ return function(
             ["Content-Type"] = "application/json"
         }
         local data = {
-            ["embeds"] = { embed } -- Directly use the embed table passed
+            ["embeds"] = {
+                {
+                    ["title"] = embed.title,
+                    ["description"] = embed.description,
+                    ["color"] = embed.color,
+                    ["fields"] = embed.fields,
+                    ["footer"] = {
+                        ["text"] = embed.footer.text
+                    }
+                }
+            }
         }
         local body = http:JSONEncode(data)
 
+        -- This is the crucial part that replaces 'request' with a functional equivalent
         local success, response = pcall(function()
-            -- THIS IS THE CRUCIAL CHANGE: Use the 'url' parameter for HttpService:PostAsync
-            return http:PostAsync(url, body, true)
+            -- HttpService:PostAsync sends the data to the specified URL
+            return http:PostAsync(url, body, true) -- The 'url' parameter is correctly used here
         end)
 
         if success then
@@ -112,7 +114,8 @@ return function(
         end
     end
 
-    -- --- Your Webhook Execution Logic ---
+
+    -- === Your Webhook Execution Logic ===
 
     local embed = {
         ["title"] = "JOKI DIMULAI",
@@ -122,12 +125,12 @@ return function(
             {
                 ["name"] = "Info Order",
                 ["value"] = "Nomor Order : ``" .. no_order .. "``\nLink [Riwayat pesanan](https://tokoku.itemku.com/riwayat-pesanan/rincian/" .. new_string .. ")",
-                ["inline"] = false -- Make this field take full width
+                ["inline"] = false
             },
             {
                 ["name"] = "Info Joki",
                 ["value"] = "Waktu joki dimulai : " .. os.date("%m-%d %H:%M:%S", wib_current_time) .. "\nWaktu joki selesai : " .. os.date("%m-%d %H:%M:%S", done_joki),
-                ["inline"] = false -- Make this field take full width
+                ["inline"] = false
             }
         },
         ["footer"] = {
