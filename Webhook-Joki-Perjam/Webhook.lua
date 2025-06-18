@@ -57,19 +57,24 @@ return function(
 
     -- === Webhook Sending Functions (Using HttpService:PostAsync) ===
 
-    -- Function to send a simple text message (fixed)
-    -- (Your example uses SendMessageEMBED, but this is fixed for completeness)
-    local function SendMessage(url_target, message_content)
-        if url_target == "" then
-            warn("SendMessage: Webhook URL is empty. Not sending.")
+    -- Original SendMessage function, fixed to use HttpService:PostAsync
+    function SendMessage(url, message)
+        if type(url) ~= "string" or url == "" then
+            warn("SendMessage: Provided URL is invalid or empty. Not sending.")
             return
         end
-        local headers = { ["Content-Type"] = "application/json" }
-        local data = { ["content"] = message_content }
-        local body = HttpService:JSONEncode(data)
-        
+
+        local http = HttpService -- Use the HttpService from the outer scope
+        local headers = {
+            ["Content-Type"] = "application/json"
+        }
+        local data = {
+            ["content"] = message
+        }
+        local body = http:JSONEncode(data)
+
         local success, response = pcall(function()
-            return HttpService:PostAsync(url_target, body, true) -- `true` enables compression (optional)
+            return http:PostAsync(url, body, true) -- Send to the 'url' parameter
         end)
 
         if success then
@@ -79,19 +84,25 @@ return function(
         end
     end
 
-    -- Function to send an embed message (fixed)
-    local function SendMessageEMBED(url_target, embed_table)
-        if url_target == "" then
-            warn("SendMessageEMBED: Webhook URL is empty. Not sending.")
+    -- Original SendMessageEMBED function, fixed to use HttpService:PostAsync
+    function SendMessageEMBED(url, embed) -- Original parameter names
+        if type(url) ~= "string" or url == "" then
+            warn("SendMessageEMBED: Provided URL is invalid or empty. Not sending.")
             return
         end
-        local headers = { ["Content-Type"] = "application/json" }
-        local data = { ["embeds"] = { embed_table } } -- Directly use the single embed table
 
-        local body = HttpService:JSONEncode(data)
+        local http = HttpService -- Use the HttpService from the outer scope
+        local headers = {
+            ["Content-Type"] = "application/json"
+        }
+        local data = {
+            ["embeds"] = { embed } -- Directly use the embed table passed
+        }
+        local body = http:JSONEncode(data)
 
         local success, response = pcall(function()
-            return HttpService:PostAsync(url_target, body, true) -- `true` enables compression (optional)
+            -- THIS IS THE CRUCIAL CHANGE: Use the 'url' parameter for HttpService:PostAsync
+            return http:PostAsync(url, body, true)
         end)
 
         if success then
@@ -101,7 +112,7 @@ return function(
         end
     end
 
-    -- === Your Webhook Execution Logic ===
+    -- --- Your Webhook Execution Logic ---
 
     local embed = {
         ["title"] = "JOKI DIMULAI",
@@ -124,9 +135,9 @@ return function(
         }
     }
 
-    -- Call SendMessageEMBED with the actual webhook URL passed into the script
+    -- Call SendMessageEMBED using the webhook_discord variable (passed into this script)
     if webhook_discord ~= "" then
-        SendMessageEMBED(webhook_discord, embed)
+        SendMessageEMBED(webhook_discord, embed) -- Pass the correct webhook_discord URL
     else
         warn("Webhook URL is empty or invalid. Cannot send webhook.")
     end
