@@ -58,7 +58,7 @@ end
 
 local embed = {
     ["title"] = "JOKI DIMULAI",
-    ["description"] = "Username : " .. username.. "", -- Concatenate "Username : " with the username variable
+    ["description"] = "Username : ||" .. username.. "||", -- Concatenate "Username : " with the username variable
     ["color"] = 65280,
     ["fields"] = {
         {
@@ -67,7 +67,7 @@ local embed = {
         },
         {
             ["name"] = "Info Joki",
-            ["value"] = "Waktu joki dimulai : <t:" ..os.time().. ":f> \nWaktu joki selesai : <t:" .. os.time() * jam_selesai_joki.. ":f>"
+            ["value"] = "Waktu joki dimulai : <t:" ..os.time().. ":f> \nWaktu joki selesai : <t:" .. os.time() + 3600 * jam_selesai_joki.. ":f>"
         }
     },
     ["footer"] = {
