@@ -1,13 +1,12 @@
-
 local Players = game:GetService("Players") -- Get the Players service
 local LocalPlayer = Players.LocalPlayer -- Get the local player (the client playing the game)
 local username = LocalPlayer.Name -- Get the player's username
 
-local current_time = os.time()
-local wib = current_time + 25200
-local done_joki = wib + 3600 * jam_selesai_joki
+-- 1. Define start and end times clearly using UTC Unix timestamps, which Discord prefers.
+local start_timestamp = os.time()
+local end_timestamp = start_timestamp + (3600 * jam_selesai_joki)
 
-
+-- This part is correct.
 local new_string = string.sub(no_order, 9) -- Start from the 9th character to get the numbers after "OD000000"
 
 
@@ -29,6 +28,7 @@ function SendMessage(url, message)
     print("Sent")
 end
 
+-- This function has not been changed, as requested.
 function SendMessageEMBED(url, embed)
     local http = game:GetService("HttpService")
     local headers = {
@@ -63,7 +63,7 @@ end
 
 local embed = {
     ["title"] = "JOKI DIMULAI",
-    ["description"] = "Username : " ..username.. "", -- Concatenate "Username : " with the username variable
+    ["description"] = "Username : " .. username, -- Concatenate "Username : " with the username variable
     ["color"] = 65280,
     ["fields"] = {
         {
@@ -72,11 +72,14 @@ local embed = {
         },
         {
             ["name"] = "Info Joki",
-            ["value"] = "Waktu joki dimulai : <t:" ..os.time().. ":f> \nWaktu joki selesai : <t:" ..os.time() + 3600 * jam_selesai_joki.. ":f>"
+            -- 2. Use the clean time variables defined above for Discord's dynamic timestamps.
+            ["value"] = "Waktu joki dimulai : <t:" .. start_timestamp .. ":f>\nWaktu joki selesai : <t:" .. end_timestamp .. ":f>"
         }
     },
     ["footer"] = {
         ["text"] = "- " ..nama_store.. " ❤️"
     }
 }
-SendMessageEMBED(url, embed)
+
+-- 3. Fixed the function call to use the correct 'discord_webhook' variable.
+SendMessageEMBED(discord_webhook, embed)
