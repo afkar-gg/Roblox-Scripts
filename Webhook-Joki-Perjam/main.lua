@@ -1,7 +1,6 @@
 --[[
     All-in-One UI and Executor Script
-    Version 2: Added text wrapping and adjusted UI layout.
-    Creates a UI to configure variables and executes a remote script using those variables.
+    - Added TextWrapped property as requested.
 ]]
 
 -- Prevent the script from running in the command bar or on the server
@@ -28,11 +27,11 @@ screenGui.Name = "ConfigExecutorUI"
 screenGui.ResetOnSpawn = false
 screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
--- Create a container frame (increased height for taller textboxes)
+-- Create a container frame
 local mainFrame = Instance.new("Frame")
 mainFrame.Name = "MainFrame"
-mainFrame.Size = UDim2.new(0, 450, 0, 335) -- Increased height
-mainFrame.Position = UDim2.new(0.5, -225, 0.5, -167)
+mainFrame.Size = UDim2.new(0, 450, 0, 270)
+mainFrame.Position = UDim2.new(0.5, -225, 0.5, -135)
 mainFrame.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
 mainFrame.BorderColor3 = Color3.fromRGB(25, 25, 25)
 mainFrame.BorderSizePixel = 2
@@ -53,12 +52,10 @@ titleLabel.TextSize = 16
 titleLabel.Parent = mainFrame
 
 -- Function to create a labeled text box for configuration
-local function createConfigRow(parent, yPos, labelText, placeholderText, boxHeight)
-    boxHeight = boxHeight or 40 -- Default height if not specified
-
+local function createConfigRow(parent, yPos, labelText, placeholderText)
     local rowLabel = Instance.new("TextLabel")
     rowLabel.Name = labelText .. "Label"
-    rowLabel.Size = UDim2.new(0, 140, 0, boxHeight)
+    rowLabel.Size = UDim2.new(0, 140, 0, 30)
     rowLabel.Position = UDim2.new(0, 15, 0, yPos)
     rowLabel.BackgroundColor3 = Color3.new(1, 1, 1)
     rowLabel.BackgroundTransparency = 1
@@ -67,12 +64,11 @@ local function createConfigRow(parent, yPos, labelText, placeholderText, boxHeig
     rowLabel.TextSize = 14
     rowLabel.Text = labelText .. " :"
     rowLabel.TextXAlignment = Enum.TextXAlignment.Left
-    rowLabel.TextYAlignment = Enum.TextYAlignment.Center
     rowLabel.Parent = parent
 
     local rowTextBox = Instance.new("TextBox")
     rowTextBox.Name = labelText .. "TextBox"
-    rowTextBox.Size = UDim2.new(0, 260, 0, boxHeight)
+    rowTextBox.Size = UDim2.new(0, 260, 0, 30)
     rowTextBox.Position = UDim2.new(0, 160, 0, yPos)
     rowTextBox.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
     rowTextBox.BorderColor3 = Color3.fromRGB(25, 25, 25)
@@ -83,26 +79,25 @@ local function createConfigRow(parent, yPos, labelText, placeholderText, boxHeig
     rowTextBox.Text = placeholderText -- Set default value
     rowTextBox.ClearTextOnFocus = false
     
-    -- Added properties for wrapping
+    -- <<< THE ONLY CHANGE IS ADDING THIS LINE >>>
     rowTextBox.TextWrapped = true
-    rowTextBox.TextYAlignment = Enum.TextYAlignment.Top
-    
+
     rowTextBox.Parent = parent
 
     return rowTextBox
 end
 
--- Create the text boxes using the function with new positions and heights
-local jamSelesaiBox = createConfigRow(mainFrame, 45, "Jam Selesai Joki", "1", 30)
-local webhookBox = createConfigRow(mainFrame, 85, "Discord Webhook", "discord webhook here", 60) -- Taller box
-local orderBox = createConfigRow(mainFrame, 155, "No. Order", "OD000000141403135", 30)
-local storeNameBox = createConfigRow(mainFrame, 195, "Nama Store", "AfkarStore", 30)
+-- Create the text boxes using the function
+local jamSelesaiBox = createConfigRow(mainFrame, 45, "Jam Selesai Joki", "1")
+local webhookBox = createConfigRow(mainFrame, 85, "Discord Webhook", "discord webhook here")
+local orderBox = createConfigRow(mainFrame, 125, "No. Order", "OD000000141403135")
+local storeNameBox = createConfigRow(mainFrame, 165, "Nama Store", "AfkarStore")
 
--- Create the execution button (repositioned due to layout changes)
+-- Create the execution button
 local executeButton = Instance.new("TextButton")
 executeButton.Name = "ExecuteButton"
 executeButton.Size = UDim2.new(1, -30, 0, 40)
-executeButton.Position = UDim2.new(0, 15, 0, 280) -- Repositioned lower
+executeButton.Position = UDim2.new(0, 15, 0, 215)
 executeButton.BackgroundColor3 = Color3.fromRGB(80, 165, 80)
 executeButton.BorderColor3 = Color3.fromRGB(25, 25, 25)
 executeButton.Font = Enum.Font.SourceSansBold
