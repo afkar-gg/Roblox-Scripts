@@ -5,7 +5,7 @@ local username = LocalPlayer.Name -- Get the player's username
 
 local current_time = os.time()
 local wib = current_time + 25200
-local done_joki = wib + 3600 * jam_selesai_joki
+local done_joki = current_time + 3600 * jam_selesai_joki
 
 
 local new_string = string.sub(no_order, 9) -- Start from the 9th character to get the numbers after "OD000000"
