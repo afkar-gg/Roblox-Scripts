@@ -142,12 +142,17 @@ executeButton.MouseButton1Click:Connect(function()
     local scriptUrl = "https://raw.githubusercontent.com/afkar-gg/Roblox-Scripts/Webhook-Joki-Perjam/Webhook.lua"
 
     -- 3. Construct the full script
-    local scriptToExecute = string.format([[
-        -- Injected variables from UI
-        local jam_selesai_joki = %s
-        local discord_webhook = "%s"
-        local no_order = "%s"
-        local nama_store = "%s"
+    -- In the UI Script (Recommended)
+local scriptToExecute = string.format([[
+    -- Injected variables from UI
+    local jam_selesai_joki = %s
+    local discord_webhook = %q
+    local no_order = %q
+    local nama_store = %q
+
+    -- Appending remote script content
+    %s
+]], jamSelesai, webhookUrl, orderNum, storeName, game:HttpGet(scriptUrl))
 
         -- Appending remote script content
         %s
