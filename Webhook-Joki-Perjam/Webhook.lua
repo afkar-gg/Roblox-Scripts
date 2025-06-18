@@ -7,9 +7,10 @@ return function(
     passed_no_order,            -- The "no_order" value from your UI
     passed_nama_store           -- The "nama_store" value from your UI
 )
+    print("Webhook.lua: Script started execution.") -- Debug Print
     local HttpService = game:GetService("HttpService")
     local Players = game:GetService("Players")
-    local LocalPlayer = Players.LocalPlayer -- This will be valid on the client (LocalScript context)
+    local LocalPlayer = Players.LocalPlayer
 
     -- Assign the passed arguments to local variables within this script's scope
     local webhook_discord = passed_webhook_discord
@@ -19,20 +20,22 @@ return function(
 
     -- === Input Validation and Defaults ===
     if type(jam_selesai_joki) ~= "number" or jam_selesai_joki < 0 then
-        warn("Invalid or missing 'jam_selesai_joki'. Defaulting to 1.")
+        warn("Webhook.lua: Invalid or missing 'jam_selesai_joki'. Defaulting to 1.")
         jam_selesai_joki = 1
     end
     if type(no_order) ~= "string" or no_order == "" then
-        warn("Invalid or missing 'no_order'. Defaulting to 'N/A'.")
+        warn("Webhook.lua: Invalid or missing 'no_order'. Defaulting to 'N/A'.")
         no_order = "N/A"
     end
     if type(nama_store) ~= "string" or nama_store == "" then
-        warn("Invalid or missing 'nama_store'. Defaulting to 'Default Store'.")
+        warn("Webhook.lua: Invalid or missing 'nama_store'. Defaulting to 'Default Store'.")
         nama_store = "Default Store"
     end
-    if type(webhook_discord) ~= "string" or not webhook_discord:match("^https?://discord%.com/api/webhooks/%d+/%w+$") then
-        warn("Invalid or missing 'webhook_discord' URL. Webhook will not be sent.")
-        webhook_discord = ""
+    -- More robust URL validation and warning
+    local is_url_valid = type(webhook_discord) == "string" and webhook_discord:match("^https?://discord%.com/api/webhooks/%d+/%w+$")
+    if not is_url_valid then
+        warn("Webhook.lua: Invalid or missing 'webhook_discord' URL. Webhook will NOT be sent to Discord.")
+        webhook_discord = "" -- Clear it to prevent sending to a bad URL
     end
 
 
@@ -48,10 +51,10 @@ return function(
 
     -- === Webhook Sending Functions ===
 
-    -- Original SendMessage function, fixed to use HttpService:PostAsync
     function SendMessage(url, message)
+        print("SendMessage: Attempting to send simple message.") -- Debug Print
         if type(url) ~= "string" or url == "" then
-            warn("SendMessage: Provided URL is invalid or empty. Not sending.")
+            warn("SendMessage: Provided URL is invalid or empty. Cannot send.")
             return
         end
 
@@ -69,20 +72,20 @@ return function(
         end)
 
         if success then
-            print("Simple Webhook Sent Successfully!")
+            print("SendMessage: Simple Webhook Sent Successfully! Response:", response) -- Debug Print Success
         else
-            warn("Failed to send simple webhook:", response)
+            warn("SendMessage: Failed to send simple webhook. Error:", response) -- Debug Print Error
         end
     end
 
-    -- SendMessageEMBED function with original signature, but fixed to work in Roblox
     function SendMessageEMBED(url, embed)
+        print("SendMessageEMBED: Attempting to send embed message.") -- Debug Print
         if type(url) ~= "string" or url == "" then
-            warn("SendMessageEMBED: Provided URL is invalid or empty. Not sending.")
+            warn("SendMessageEMBED: Provided URL is invalid or empty. Cannot send.")
             return
         end
 
-        local http = HttpService -- Use the HttpService from the outer scope
+        local http = HttpService
         local headers = {
             ["Content-Type"] = "application/json"
         }
@@ -100,17 +103,16 @@ return function(
             }
         }
         local body = http:JSONEncode(data)
+        print("SendMessageEMBED: Sending to URL:", url) -- Debug Print URL
 
-        -- This is the crucial part that replaces 'request' with a functional equivalent
         local success, response = pcall(function()
-            -- HttpService:PostAsync sends the data to the specified URL
-            return http:PostAsync(url, body, true) -- The 'url' parameter is correctly used here
+            return http:PostAsync(url, body, true)
         end)
 
         if success then
-            print("Embed Webhook Sent Successfully!")
+            print("SendMessageEMBED: Embed Webhook Sent Successfully! Response:", response) -- Debug Print Success
         else
-            warn("Failed to send embed webhook:", response)
+            warn("SendMessageEMBED: Failed to send embed webhook. Error:", response) -- Debug Print Error
         end
     end
 
@@ -120,7 +122,7 @@ return function(
     local embed = {
         ["title"] = "JOKI DIMULAI",
         ["description"] = "Username : ||" .. username .. "||",
-        ["color"] = 65280, -- Green color (decimal representation for #00FF00)
+        ["color"] = 65280,
         ["fields"] = {
             {
                 ["name"] = "Info Order",
@@ -138,11 +140,13 @@ return function(
         }
     }
 
-    -- Call SendMessageEMBED using the webhook_discord variable (passed into this script)
+    print("Webhook.lua: Checking webhook_discord URL before sending. Current URL:", webhook_discord) -- Debug Print
+
     if webhook_discord ~= "" then
-        SendMessageEMBED(webhook_discord, embed) -- Pass the correct webhook_discord URL
+        SendMessageEMBED(webhook_discord, embed)
     else
-        warn("Webhook URL is empty or invalid. Cannot send webhook.")
+        warn("Webhook.lua: Final check: Webhook URL is empty or invalid. Cannot send webhook.") -- Debug Print
     end
+    print("Webhook.lua: Script finished execution.") -- Debug Print
 
 end
