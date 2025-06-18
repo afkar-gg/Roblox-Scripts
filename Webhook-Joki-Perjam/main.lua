@@ -104,25 +104,83 @@ SaveButton.Text = "Save Changes"
 SaveButton.Parent = MainFrame
 
 -- Event for the Save Changes button
-SaveButton.MouseButton1Click:Connect(function()
-    local newJamSelesaiJoki = tonumber(JamSelesaiJokiInput.Text)
-    if newJamSelesaiJoki and newJamSelesaiJoki >= 0 then
-        jam_selesai_joki = newJamSelesaiJoki
-    else
-        warn("Invalid input for 'Jam Selesai Joki'. Please enter a valid number.")
-        JamSelesaiJokiInput.Text = tostring(jam_selesai_joki)
+-- In your UI Script (LocalScript in StarterPlayerScripts)
+-- Only the ExecuteButton.MouseButton1Click part is shown, the rest of your UI script stays the same.
+
+-- ... (your existing UI setup code above this) ...
+
+-- Button to execute the loadstring code
+-- ... (ExecuteButton creation code) ...
+
+ExecuteButton.MouseButton1Click:Connect(function()
+    print("UI Script: Button clicked. Starting webhook execution process.") -- Debug 1: Confirm button click
+
+    local loaded_script_content = nil
+    local get_http_success, get_http_result = pcall(function()
+        -- Attempt to download the script content from the URL
+        return game:HttpGet("https://raw.githubusercontent.com/afkar-gg/Roblox-Scripts/refs/heads/main/Webhook-Joki-Perjam/Webhook.lua")
+    end)
+
+    if not get_http_success then
+        -- Debug 2: HttpGet failed
+        warn("UI Script: ERROR! Failed to download webhook script content via HttpGet. Error:", get_http_result)
+        warn("UI Script: Please ensure 'Allow HTTP Requests' is enabled in Game Settings > Security.")
+        return -- Stop execution if download fails
     end
 
-    webhook_discord = WebhookDiscordInput.Text
-    no_order = NoOrderInput.Text
-    nama_store = NamaStoreInput.Text
+    loaded_script_content = get_http_result
+    print("UI Script: Script content downloaded successfully. Length:", #loaded_script_content, "bytes.") -- Debug 3: HttpGet success
 
-    print("Variables updated:")
-    print("  Jam Selesai Joki:", jam_selesai_joki)
-    print("  Webhook Discord:", webhook_discord)
-    print("  No. Order:", no_order)
-    print("  Nama Store:", nama_store)
+    if #loaded_script_content == 0 then
+        warn("UI Script: WARNING! Downloaded script content is empty. Cannot proceed.")
+        return
+    end
+
+    -- Now try to loadstring the content
+    local success, script_chunk_func = pcall(function()
+        return loadstring(loaded_script_content)
+    end)
+
+    if not success then
+        -- Debug 4: loadstring failed
+        warn("UI Script: ERROR! Failed to loadstring the script content. Error:", script_chunk_func)
+        warn("UI Script: This usually means the downloaded script has a syntax error.")
+        return -- Stop execution if loadstring fails
+    end
+
+    if type(script_chunk_func) == "function" then
+        print("UI Script: Script chunk loaded successfully. Attempting to execute it.") -- Debug 5: loadstring success
+
+        local exec_success, exec_result = pcall(function()
+            -- This calls the loaded chunk, which should return the main function
+            return script_chunk_func()
+        end)
+
+        if exec_success and type(exec_result) == "function" then
+            local webhook_executor = exec_result
+            print("UI Script: Webhook executor function obtained. Calling it with UI data.") -- Debug 6: Executor obtained
+
+            local final_call_success, final_call_result = pcall(function()
+                -- Pass the current values of your UI variables to the loaded script's function
+                webhook_executor(webhook_discord, jam_selesai_joki, no_order, nama_store)
+            end)
+
+            if final_call_success then
+                print("UI Script: Webhook script execution completed. (Check Webhook.lua prints for send status)") -- Debug 7: Final call success
+            else
+                warn("UI Script: ERROR! An error occurred during the execution of the webhook_executor function itself. Error:", final_call_result) -- Debug 8: Error in webhook_executor
+            end
+        else
+            warn("UI Script: ERROR! The loaded script did not return a function as expected. Type:", type(exec_result), "Value:", exec_result) -- Debug 9: Returned wrong type
+            warn("UI Script: Please ensure Webhook.lua starts with `return function(...) ... end`.")
+        end
+    else
+        warn("UI Script: ERROR! `loadstring` did not return a function. Type:", type(script_chunk_func), "Value:", script_chunk_func) -- Debug 10: loadstring returned non-function
+        warn("UI Script: This is unexpected if loadstring didn't error. Check console for previous `loadstring` errors.")
+    end
+    print("UI Script: End of button click logic.") -- Debug 11: End of script
 end)
+
 
 -- Button to execute the loadstring code
 local ExecuteButton = Instance.new("TextButton")
