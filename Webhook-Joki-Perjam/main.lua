@@ -1,6 +1,7 @@
 --[[
     All-in-One UI and Executor Script
-    - Added TextWrapped property as requested.
+    - Added TextWrapped property.
+    - Added Placeholder Text Labels.
 ]]
 
 -- Prevent the script from running in the command bar or on the server
@@ -75,22 +76,45 @@ local function createConfigRow(parent, yPos, labelText, placeholderText)
     rowTextBox.Font = Enum.Font.SourceSans
     rowTextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
     rowTextBox.TextSize = 14
-    rowTextBox.PlaceholderText = placeholderText
-    rowTextBox.Text = placeholderText -- Set default value
-    rowTextBox.ClearTextOnFocus = false
-    
-    -- <<< THE ONLY CHANGE IS ADDING THIS LINE >>>
     rowTextBox.TextWrapped = true
 
+    -- Placeholder TextLabel
+    local placeholderLabel = Instance.new("TextLabel")
+    placeholderLabel.Name = labelText .. "Placeholder"
+    placeholderLabel.Size = UDim2.new(1, 0, 1, 0)
+    placeholderLabel.BackgroundColor3 = Color3.new(1, 1, 1)
+    placeholderLabel.BackgroundTransparency = 1
+    placeholderLabel.Font = Enum.Font.SourceSans
+    placeholderLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
+    placeholderLabel.TextSize = 14
+    placeholderLabel.Text = placeholderText
+    placeholderLabel.Visible = true
+    placeholderLabel.ZIndex = 0
+    placeholderLabel.Parent = rowTextBox
+
+    rowTextBox.ZIndex = 1
+    rowTextBox.ClearTextOnFocus = false
     rowTextBox.Parent = parent
+
+    -- Event to handle placeholder visibility
+    rowTextBox.Focused:Connect(function()
+        placeholderLabel.Visible = false
+    end)
+
+    rowTextBox.FocusLost:Connect(function()
+        placeholderLabel.Visible = (rowTextBox.Text == "")
+    end)
+
+    -- Initial visibility check
+    placeholderLabel.Visible = (rowTextBox.Text == "")
 
     return rowTextBox
 end
 
 -- Create the text boxes using the function
-local jamSelesaiBox = createConfigRow(mainFrame, 45, "Jam Selesai Joki", "1")
-local webhookBox = createConfigRow(mainFrame, 85, "Discord Webhook", "discord webhook here")
-local orderBox = createConfigRow(mainFrame, 125, "No. Order", "OD000000141403135")
+local jamSelesaiBox = createConfigRow(mainFrame, 45, "Jam Selesai Joki", "Put Hour Here")
+local webhookBox = createConfigRow(mainFrame, 85, "Discord Webhook", "Put Webhook Link Here")
+local orderBox = createConfigRow(mainFrame, 125, "No. Order", "Put No. Order Here")
 local storeNameBox = createConfigRow(mainFrame, 165, "Nama Store", "AfkarStore")
 
 -- Create the execution button
@@ -128,7 +152,7 @@ executeButton.MouseButton1Click:Connect(function()
     local storeName = storeNameBox.Text
 
     -- Basic validation
-    if webhookUrl == "" or webhookUrl == "discord webhook here" then
+    if webhookUrl == "" or webhookUrl == "Put Webhook Link Here" then
         warn("Webhook URL is empty. Please enter a valid URL.")
         executeButton.Text = "INVALID WEBHOOK URL"
         executeButton.BackgroundColor3 = Color3.fromRGB(200, 70, 70)
