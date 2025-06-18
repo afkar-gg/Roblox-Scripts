@@ -29,7 +29,8 @@ function SendMessage(url, message)
 end
 
 -- This function has not been changed, as requested.
-function SendMessageEMBED(discord_webhook, embed)
+-- In Webhook.lua (Corrected)
+function SendMessageEMBED(url, embed)
     local http = game:GetService("HttpService")
     local headers = {
         ["Content-Type"] = "application/json"
@@ -47,39 +48,29 @@ function SendMessageEMBED(discord_webhook, embed)
             }
         }
     }
-    local body = http:JSONEncode(data)
-    local response = request({
-        Url = discord_webhook,
-        Method = "POST",
-        Headers = headers,
-        Body = body
-    })
-    print("Sent")
+    
+    -- Encode the data table into a JSON string
+    local success, body = pcall(function()
+        return http:JSONEncode(data)
+    end)
+
+    if not success then
+        warn("Failed to encode JSON body:", body)
+        return
+    end
+
+    -- Use HttpService:PostAsync in a protected call
+    local success, response = pcall(function()
+        return http:PostAsync(url, body, Enum.HttpContentType.ApplicationJson)
+    end)
+
+    if success then
+        print("Webhook message sent successfully.")
+    else
+        warn("Failed to send webhook message:", response)
+    end
 end
 
-
---Examples
-
-
-local embed = {
-    ["title"] = "JOKI DIMULAI",
-    ["description"] = "Username : " .. username, -- Concatenate "Username : " with the username variable
-    ["color"] = 65280,
-    ["fields"] = {
-        {
-            ["name"] = "Info Order",
-            ["value"] = "Nomor Order : " ..no_order.. "\nLink [Riwayat pesanan](https://tokoku.itemku.com/riwayat-pesanan/rincian/" ..new_string.. ")"
-        },
-        {
-            ["name"] = "Info Joki",
-            -- 2. Use the clean time variables defined above for Discord's dynamic timestamps.
-            ["value"] = "Waktu joki dimulai : <t:" .. start_timestamp .. ":f>\nWaktu joki selesai : <t:" .. end_timestamp .. ":f>"
-        }
-    },
-    ["footer"] = {
-        ["text"] = "- " ..nama_store.. " ❤️"
-    }
-}
 
 -- 3. Fixed the function call to use the correct 'discord_webhook' variable.
 SendMessageEMBED(discord_webhook, embed)
