@@ -7,8 +7,8 @@ ScreenGui.ResetOnSpawn = false -- Keeps the UI visible after character respawns
 -- Main Frame for the UI (this will be draggable)
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = "MainFrame"
-MainFrame.Size = UDim2.new(0, 380, 0, 320) -- Slightly increased width for better text fit
-MainFrame.Position = UDim2.new(0.5, -190, 0.5, -160) -- Recenter with new size
+MainFrame.Size = UDim2.new(0, 380, 0, 320) -- Consistent size
+MainFrame.Position = UDim2.new(0.5, -190, 0.5, -160) -- Recenter
 MainFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 MainFrame.BorderColor3 = Color3.fromRGB(25, 25, 25)
 MainFrame.BorderSizePixel = 2
@@ -45,7 +45,7 @@ ToggleButton.TextSize = 20
 ToggleButton.Text = "-"
 ToggleButton.Parent = MainFrame
 
-ToggleButton.MouseButton1Click:Connect(function()
+ToggleButton.MouseButton11Click:Connect(function() -- Corrected: MouseButton1Click
     MainFrame.Visible = not MainFrame.Visible -- Toggle visibility
 end)
 
@@ -59,7 +59,7 @@ local nama_store = "AfkarStore"
 local function createInputPair(parent, yOffset, labelText, initialValue)
     local label = Instance.new("TextLabel")
     label.Name = labelText:gsub(" ", "") .. "Label"
-    label.Size = UDim2.new(0.35, 0, 0, 25) -- Increased label width slightly
+    label.Size = UDim2.new(0.35, 0, 0, 25)
     label.Position = UDim2.new(0, 10, 0, yOffset)
     label.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
     label.TextColor3 = Color3.fromRGB(200, 200, 200)
@@ -71,15 +71,15 @@ local function createInputPair(parent, yOffset, labelText, initialValue)
 
     local textBox = Instance.new("TextBox")
     textBox.Name = labelText:gsub(" ", "") .. "Input"
-    textBox.Size = UDim2.new(0.60, -20, 0, 25) -- Adjusted size to fit within frame with padding
-    textBox.Position = UDim2.new(0.35, 10, 0, yOffset) -- Aligned with label, adjusted offset
+    textBox.Size = UDim2.new(0.60, -20, 0, 25)
+    textBox.Position = UDim2.new(0.35, 10, 0, yOffset)
     textBox.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
     textBox.TextColor3 = Color3.fromRGB(255, 255, 255)
     textBox.Font = Enum.Font.SourceSans
     textBox.TextSize = 14
     textBox.Text = tostring(initialValue)
     textBox.ClearTextOnFocus = false
-    textBox.TextWrapped = true -- IMPORTANT: Wrap text if it's too long for the box
+    textBox.TextWrapped = true
     textBox.Parent = parent
 
     return textBox
@@ -95,12 +95,13 @@ local NamaStoreInput = createInputPair(MainFrame, 140, "Nama Store", nama_store)
 local SaveButton = Instance.new("TextButton")
 SaveButton.Name = "SaveButton"
 SaveButton.Size = UDim2.new(1, -20, 0, 40)
-SaveButton.Position = UDim2.new(0, 10, 0, 190) -- Position below inputs
-SaveButton.BackgroundColor3 = Color3.fromRGB(50, 150, 50) -- Greenish color
+SaveButton.Position = UDim2.new(0, 10, 0, 190)
+SaveButton.BackgroundColor3 = Color3.fromRGB(50, 150, 50)
 SaveButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 SaveButton.Font = Enum.Font.SourceSansBold
 SaveButton.TextSize = 18
 SaveButton.Text = "Save Changes"
+SaveButton.ZIndex = 2 -- Set ZIndex
 SaveButton.Parent = MainFrame
 
 -- Event for the Save Changes button
@@ -110,7 +111,7 @@ SaveButton.MouseButton1Click:Connect(function()
         jam_selesai_joki = newJamSelesaiJoki
     else
         warn("UI Script: Invalid input for 'Jam Selesai Joki'. Please enter a valid number.")
-        JamSelesaiJokiInput.Text = tostring(jam_selesai_joki) -- Revert to last valid
+        JamSelesaiJokiInput.Text = tostring(jam_selesai_joki)
     end
 
     webhook_discord = WebhookDiscordInput.Text
@@ -128,82 +129,77 @@ end)
 local ExecuteButton = Instance.new("TextButton")
 ExecuteButton.Name = "ExecuteButton"
 ExecuteButton.Size = UDim2.new(1, -20, 0, 40)
-ExecuteButton.Position = UDim2.new(0, 10, 0, 240) -- Position below Save button
+ExecuteButton.Position = UDim2.new(0, 10, 0, 245) -- Slightly adjusted Y position
 ExecuteButton.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
 ExecuteButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 ExecuteButton.Font = Enum.Font.SourceSansBold
 ExecuteButton.TextSize = 18
 ExecuteButton.Text = "Execute Webhook Script"
+ExecuteButton.ZIndex = 3 -- Higher ZIndex to ensure it's on top
 ExecuteButton.Parent = MainFrame
 
 -- Event for the Execute button click (with detailed debugging)
 ExecuteButton.MouseButton1Click:Connect(function()
-    print("UI Script: Button clicked. Starting webhook execution process.") -- Debug 1: Confirm button click
+    print("UI Script: Button clicked. Starting webhook execution process.")
 
     local loaded_script_content = nil
     local get_http_success, get_http_result = pcall(function()
-        -- Attempt to download the script content from the URL
         return game:HttpGet("https://raw.githubusercontent.com/afkar-gg/Roblox-Scripts/refs/heads/main/Webhook-Joki-Perjam/Webhook.lua")
     end)
 
     if not get_http_success then
-        -- Debug 2: HttpGet failed
         warn("UI Script: ERROR! Failed to download webhook script content via HttpGet. Error:", get_http_result)
         warn("UI Script: Please ensure 'Allow HTTP Requests' is enabled in Game Settings > Security.")
-        return -- Stop execution if download fails
+        return
     end
 
     loaded_script_content = get_http_result
-    print("UI Script: Script content downloaded successfully. Length:", #loaded_script_content, "bytes.") -- Debug 3: HttpGet success
+    print("UI Script: Script content downloaded successfully. Length:", #loaded_script_content, "bytes.")
 
     if #loaded_script_content == 0 then
         warn("UI Script: WARNING! Downloaded script content is empty. Cannot proceed.")
         return
     end
 
-    -- Now try to loadstring the content
     local success, script_chunk_func = pcall(function()
         return loadstring(loaded_script_content)
     end)
 
     if not success then
-        -- Debug 4: loadstring failed
         warn("UI Script: ERROR! Failed to loadstring the script content. Error:", script_chunk_func)
         warn("UI Script: This usually means the downloaded script has a syntax error.")
-        return -- Stop execution if loadstring fails
+        return
     end
 
     if type(script_chunk_func) == "function" then
-        print("UI Script: Script chunk loaded successfully. Attempting to execute it.") -- Debug 5: loadstring success
+        print("UI Script: Script chunk loaded successfully. Attempting to execute it.")
 
         local exec_success, exec_result = pcall(function()
-            -- This calls the loaded chunk, which should return the main function
             return script_chunk_func()
         end)
 
         if exec_success and type(exec_result) == "function" then
             local webhook_executor = exec_result
-            print("UI Script: Webhook executor function obtained. Calling it with UI data.") -- Debug 6: Executor obtained
+            print("UI Script: Webhook executor function obtained. Calling it with UI data.")
 
             local final_call_success, final_call_result = pcall(function()
-                -- Pass the current values of your UI variables to the loaded script's function
                 webhook_executor(webhook_discord, jam_selesai_joki, no_order, nama_store)
             end)
 
             if final_call_success then
-                print("UI Script: Webhook script execution completed. (Check Webhook.lua prints for send status)") -- Debug 7: Final call success
+                print("UI Script: Webhook script execution completed. (Check Webhook.lua prints for send status)")
             else
-                warn("UI Script: ERROR! An error occurred during the execution of the webhook_executor function itself. Error:", final_call_result) -- Debug 8: Error in webhook_executor
+                warn("UI Script: ERROR! An error occurred during the execution of the webhook_executor function itself. Error:", final_call_result)
             end
         else
-            warn("UI Script: ERROR! The loaded script did not return a function as expected. Type:", type(exec_result), "Value:", exec_result) -- Debug 9: Returned wrong type
+            warn("UI Script: ERROR! The loaded script did not return a function as expected. Type:", type(exec_result), "Value:", exec_result)
             warn("UI Script: Please ensure Webhook.lua starts with `return function(...) ... end`.")
         end
     else
-        warn("UI Script: ERROR! `loadstring` did not return a function. Type:", type(script_chunk_func), "Value:", script_chunk_func) -- Debug 10: loadstring returned non-function
+        warn("UI Script: ERROR! `loadstring` did not return a function. Type:", type(script_chunk_func), "Value:", script_chunk_func)
         warn("UI Script: This is unexpected if loadstring didn't error. Check console for previous `loadstring` errors.")
     end
-    print("UI Script: End of button click logic.") -- Debug 11: End of script
+    print("UI Script: End of button click logic.")
 end)
 
 print("Movable Editable UI loaded successfully!")
