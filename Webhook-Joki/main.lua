@@ -19,8 +19,8 @@ screenGui.Parent = game:GetService("CoreGui")
 
 local mainFrame = Instance.new("Frame")
 mainFrame.Name = "MainFrame"
-mainFrame.Size = UDim2.new(0, 400, 0, 380)
-mainFrame.Position = UDim2.new(0.5, -200, 0.5, -190)
+mainFrame.Size = UDim2.new(0, 400, 0, 400)
+mainFrame.Position = UDim2.new(0.5, -200, 0.5, -200)
 mainFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
 mainFrame.BorderColor3 = Color3.fromRGB(85, 85, 105)
 mainFrame.BorderSizePixel = 2
@@ -35,8 +35,8 @@ frameCorner.Parent = mainFrame
 -- Close button
 local closeButton = Instance.new("TextButton")
 closeButton.Name = "CloseButton"
-closeButton.Size = UDim2.new(0, 22, 0, 22)
-closeButton.Position = UDim2.new(1, -26, 0, 4)
+closeButton.Size = UDim2.new(0, 24, 0, 24)
+closeButton.Position = UDim2.new(1, -28, 0, 6)
 closeButton.AnchorPoint = Vector2.new(1, 0)
 closeButton.BackgroundColor3 = Color3.fromRGB(231, 76, 60)
 closeButton.Text = "X"
@@ -53,11 +53,11 @@ closeButton.MouseButton1Click:Connect(function()
     screenGui:Destroy()
 end)
 
--- Tabs under close button
+-- Tabs below close button
 local tabHolder = Instance.new("Frame")
 tabHolder.Name = "TabHolder"
-tabHolder.Size = UDim2.new(1, -32, 0, 30)
-tabHolder.Position = UDim2.new(0, 4, 0, 30)
+tabHolder.Size = UDim2.new(1, -10, 0, 30)
+tabHolder.Position = UDim2.new(0, 5, 0, 35)
 tabHolder.BackgroundTransparency = 1
 tabHolder.Parent = mainFrame
 
@@ -92,8 +92,8 @@ local toolsTabBtn = createTabButton("Tools")
 
 local contentFrame = Instance.new("Frame")
 contentFrame.Name = "ContentFrame"
-contentFrame.Position = UDim2.new(0, 0, 0, 65)
-contentFrame.Size = UDim2.new(1, 0, 1, -65)
+contentFrame.Position = UDim2.new(0, 0, 0, 70)
+contentFrame.Size = UDim2.new(1, 0, 1, -70)
 contentFrame.BackgroundTransparency = 1
 contentFrame.Parent = mainFrame
 
@@ -121,4 +121,5 @@ toolsTabBtn.MouseButton1Click:Connect(function()
     toolsFrame.Visible = true
 end)
 
--- Rest of the script remains unchanged from the previous version
+-- Now you can place your UI elements inside webhookFrame and toolsFrame
+-- For example, you can reuse the webhook form and Infinite Yield button here.
