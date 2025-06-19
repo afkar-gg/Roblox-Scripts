@@ -57,7 +57,7 @@ end
 
 
 local embed = {
-    ["title"] = "JOKI DIMULAI",
+    ["title"] = "JOKI DILANJUTKAN",
     ["description"] = "Username : ||" .. username.. "||", -- Concatenate "Username : " with the username variable
     ["color"] = 65280,
     ["fields"] = {
