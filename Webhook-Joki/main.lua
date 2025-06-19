@@ -120,9 +120,15 @@ local minimizedHeight = 40
 minimizeButton.MouseButton1Click:Connect(function()
     state.minimized = not state.minimized
     saveConfig(state)
-    TweenService:Create(mainFrame, TweenInfo.new(0.25), {
-        Size = state.minimized and UDim2.new(0, 400, 0, minimizedHeight) or UDim2.new(0, 400, 0, fullHeight)
-    }):Play()
+
+    -- UI Tween
+    local targetSize = state.minimized and UDim2.new(0, 400, 0, minimizedHeight) or UDim2.new(0, 400, 0, fullHeight)
+    TweenService:Create(mainFrame, TweenInfo.new(0.25), {Size = targetSize}):Play()
+
+    -- Show/hide tab UI + content
+    tabHolder.Visible = not state.minimized
+    webhookTab.Visible = not state.minimized and state.activeTab == "Webhook"
+    toolsTab.Visible = not state.minimized and state.activeTab == "Tools"
 end)
 
 -- Tab Setup
