@@ -1,48 +1,12 @@
 --[[
-    Final All-in-One Script: Webhook + Infinite Yield + Config Save/Load
-    Fixed early variable access issue
+    Clean Webhook + Infinite Yield UI
+    Auto-save/load temporarily removed for troubleshooting
 ]]
 
 if not game:IsLoaded() then game.Loaded:Wait() end
 if not game:GetService("Players").LocalPlayer then
     warn("This script must be run from a client executor.")
     return
-end
-
--- === CONFIG SETUP ===
-local HttpService = game:GetService("HttpService")
-local configFile = "joki_config.json"
-local canUseFile = (readfile and writefile and isfile) and true or false
-
-local defaultConfig = {
-    jam_selesai_joki = 1,
-    discord_webhook = "",
-    no_order = "",
-    nama_store = ""
-}
-
-local function shallowCopy(tbl)
-    local copy = {}
-    for k, v in pairs(tbl) do
-        copy[k] = v
-    end
-    return copy
-end
-
-local savedConfig = shallowCopy(defaultConfig)
-
-if canUseFile and isfile(configFile) then
-    local success, data = pcall(readfile, configFile)
-    if success then
-        local decodeSuccess, decoded = pcall(HttpService.JSONDecode, HttpService, data)
-        if decodeSuccess and typeof(decoded) == "table" then
-            for k, v in pairs(decoded) do
-                if savedConfig[k] ~= nil then
-                    savedConfig[k] = v
-                end
-            end
-        end
-    end
 end
 
 -- === UI SETUP ===
@@ -114,7 +78,7 @@ closeButton.MouseButton1Click:Connect(function()
     screenGui.Enabled = false
 end)
 
--- Content
+-- Content Frame
 local contentFrame = Instance.new("Frame")
 contentFrame.Size = UDim2.new(1, 0, 1, -30)
 contentFrame.Position = UDim2.new(0, 0, 0, 30)
@@ -131,8 +95,8 @@ local padding = Instance.new("UIPadding")
 padding.PaddingTop = UDim.new(0, 10)
 padding.Parent = contentFrame
 
--- Input helper
-local function createLabeledInput(name, placeholder, order, isNumber)
+-- Input Helper
+local function createLabeledInput(name, placeholder, order, defaultValue)
     local container = Instance.new("Frame")
     container.Size = UDim2.new(0.9, 0, 0, 50)
     container.BackgroundTransparency = 1
@@ -157,7 +121,7 @@ local function createLabeledInput(name, placeholder, order, isNumber)
     textbox.BorderSizePixel = 1
     textbox.Font = Enum.Font.SourceSans
     textbox.PlaceholderText = placeholder
-    textbox.Text = isNumber and tostring(savedConfig[name]) or (savedConfig[name] or "")
+    textbox.Text = defaultValue
     textbox.TextColor3 = Color3.fromRGB(255, 255, 255)
     textbox.TextSize = 14
     textbox.ClearTextOnFocus = false
@@ -171,34 +135,13 @@ local function createLabeledInput(name, placeholder, order, isNumber)
     return textbox
 end
 
--- Input fields
-local jamSelesaiBox = createLabeledInput("jam_selesai_joki", "e.g., 1", 1, true)
-local webhookBox = createLabeledInput("discord_webhook", "Paste your Discord Webhook URL here", 2, false)
-local orderBox = createLabeledInput("no_order", "e.g., OD000000141403135", 3, false)
-local storeNameBox = createLabeledInput("nama_store", "e.g., AfkarStore", 4, false)
+-- Inputs with hardcoded defaults
+local jamSelesaiBox = createLabeledInput("jam_selesai_joki", "e.g., 1", 1, "1")
+local webhookBox = createLabeledInput("discord_webhook", "Paste your Discord Webhook URL here", 2, "")
+local orderBox = createLabeledInput("no_order", "e.g., OD000000141403135", 3, "")
+local storeNameBox = createLabeledInput("nama_store", "e.g., AfkarStore", 4, "")
 
--- Save function (defined after inputs exist)
-local function saveConfig()
-    if not canUseFile then return end
-    local configToSave = {
-        jam_selesai_joki = tonumber(jamSelesaiBox.Text) or 1,
-        discord_webhook = webhookBox.Text,
-        no_order = orderBox.Text,
-        nama_store = storeNameBox.Text
-    }
-    local success, encoded = pcall(HttpService.JSONEncode, HttpService, configToSave)
-    if success then
-        pcall(writefile, configFile, encoded)
-    end
-end
-
--- Save on field change
-jamSelesaiBox.FocusLost:Connect(saveConfig)
-webhookBox.FocusLost:Connect(saveConfig)
-orderBox.FocusLost:Connect(saveConfig)
-storeNameBox.FocusLost:Connect(saveConfig)
-
--- Execute button
+-- Execute Button
 local executeButton = Instance.new("TextButton")
 executeButton.Size = UDim2.new(0.9, 0, 0, 40)
 executeButton.BackgroundColor3 = Color3.fromRGB(88, 101, 242)
@@ -215,6 +158,7 @@ local btnCorner = Instance.new("UICorner")
 btnCorner.CornerRadius = UDim.new(0, 6)
 btnCorner.Parent = executeButton
 
+-- Execution Logic
 executeButton.MouseButton1Click:Connect(function()
     local jamSelesai = tonumber(jamSelesaiBox.Text) or 1
     local webhookUrl = webhookBox.Text
@@ -245,7 +189,7 @@ executeButton.MouseButton1Click:Connect(function()
     if not success1 or not webhookScript then
         executeButton.Text = "WEBHOOK GET FAILED"
         executeButton.BackgroundColor3 = Color3.fromRGB(237, 66, 69)
-        warn("Failed to fetch Webhook.lua:", webhookScript)
+        warn("Webhook fetch error:", webhookScript)
         wait(3)
         goto reset
     end
@@ -253,7 +197,7 @@ executeButton.MouseButton1Click:Connect(function()
     if not success2 or not iyScript then
         executeButton.Text = "INFINITE YIELD GET FAILED"
         executeButton.BackgroundColor3 = Color3.fromRGB(237, 66, 69)
-        warn("Failed to fetch Infinite Yield:", iyScript)
+        warn("IY fetch error:", iyScript)
         wait(3)
         goto reset
     end
@@ -269,8 +213,8 @@ executeButton.MouseButton1Click:Connect(function()
         %s
     ]], jamSelesai, webhookUrl, orderId, storeName, webhookScript, iyScript)
 
-    local loadFunc, err = loadstring(finalScript)
-    if not loadFunc then
+    local func, err = loadstring(finalScript)
+    if not func then
         warn("loadstring error:", err)
         executeButton.Text = "SCRIPT ERROR"
         executeButton.BackgroundColor3 = Color3.fromRGB(237, 66, 69)
@@ -278,7 +222,7 @@ executeButton.MouseButton1Click:Connect(function()
         goto reset
     end
 
-    local success, runtimeErr = pcall(loadFunc)
+    local success, runtimeErr = pcall(func)
     if success then
         executeButton.Text = "SUCCESS!"
         executeButton.BackgroundColor3 = Color3.fromRGB(87, 242, 135)
