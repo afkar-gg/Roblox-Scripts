@@ -169,14 +169,46 @@ minimizeButton.MouseButton1Click:Connect(function()
     state.minimized = not state.minimized
     saveConfig(state)
 
-    TweenService:Create(mainFrame, TweenInfo.new(0.25), {
-        Size = state.minimized and UDim2.new(0, 400, 0, minimizedHeight) or UDim2.new(0, 400, 0, fullHeight)
-    }):Play()
+    local targetSize = state.minimized and UDim2.new(0, 400, 0, minimizedHeight) or UDim2.new(0, 400, 0, fullHeight)
+    TweenService:Create(mainFrame, TweenInfo.new(0.25), {Size = targetSize}):Play()
 
     tabHolder.Visible = not state.minimized
-    webhookContent.Visible = not state.minimized and state.activeTab == "Webhook"
-    toolsContent.Visible = not state.minimized and state.activeTab == "Tools"
+
+    -- Helper to tween all GuiObjects inside a frame
+    local function tweenFade(frame, fadeOut)
+        for _, child in ipairs(frame:GetChildren()) do
+            if child:IsA("TextLabel") or child:IsA("TextButton") or child:IsA("TextBox") then
+                local goal = {TextTransparency = fadeOut and 1 or 0}
+                TweenService:Create(child, TweenInfo.new(0.25), goal):Play()
+            elseif child:IsA("Frame") then
+                local goal = {BackgroundTransparency = fadeOut and 1 or 0}
+                TweenService:Create(child, TweenInfo.new(0.25), goal):Play()
+            end
+        end
+    end
+
+    -- Fade out current tab content
+    if state.minimized then
+        if state.activeTab == "Webhook" then
+            tweenFade(webhookContent, true)
+        else
+            tweenFade(toolsContent, true)
+        end
+        task.delay(0.25, function()
+            webhookContent.Visible = false
+            toolsContent.Visible = false
+        end)
+    else
+        if state.activeTab == "Webhook" then
+            webhookContent.Visible = true
+            tweenFade(webhookContent, false)
+        else
+            toolsContent.Visible = true
+            tweenFade(toolsContent, false)
+        end
+    end
 end)
+
 
 -- Initialize tab visibility
 tabHolder.Visible = not state.minimized
