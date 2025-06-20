@@ -3,11 +3,6 @@
     Built for development and debugging
 ]]
 
-if not game:IsLoaded() then game.Loaded:Wait() end
-if not game:GetService("Players").LocalPlayer then
-    warn("This script must be run from a client executor.")
-    return
-end
 
 -- === CONFIG SETUP ===
 local HttpService = game:GetService("HttpService")
