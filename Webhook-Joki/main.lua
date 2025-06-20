@@ -179,6 +179,7 @@ minimizeButton.MouseButton1Click:Connect(function()
         local transparency = fadeOut and 1 or 0
         for _, child in frame:GetDescendants() do
             if child:IsA("TextLabel") or child:IsA("TextBox") or child:IsA("TextButton") then
+                child.BackgroundTransparency = 1 -- fix white background bug
                 TweenService:Create(child, tweenInfo, {
                     TextTransparency = transparency,
                     BackgroundTransparency = transparency
