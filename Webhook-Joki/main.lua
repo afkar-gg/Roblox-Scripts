@@ -1,7 +1,7 @@
 --[[
-    All-in-One UI Script with Auto-Save, Webhook Execution, Infinite Yield
-    Designed for executor-based development/testing
---]]
+    All-in-One UI with Executor-Safe Auto-Save and Webhook + Infinite Yield
+    Built for development and debugging
+]]
 
 if not game:IsLoaded() then game.Loaded:Wait() end
 if not game:GetService("Players").LocalPlayer then
@@ -9,41 +9,45 @@ if not game:GetService("Players").LocalPlayer then
     return
 end
 
--- Services & Config
-local CoreGui = game:GetService("CoreGui")
+-- === CONFIG SETUP ===
 local HttpService = game:GetService("HttpService")
 local configFile = "joki_config.json"
 
-local savedConfig = {
+local canUseFile = (readfile and writefile and isfile) and true or false
+
+local defaultConfig = {
     jam_selesai_joki = 1,
     discord_webhook = "",
     no_order = "",
     nama_store = ""
 }
 
--- Load saved config
-if pcall(function() return readfile(configFile) end) then
-    local success, decoded = pcall(function()
-        return HttpService:JSONDecode(readfile(configFile))
-    end)
+local savedConfig = table.clone(defaultConfig)
+
+if canUseFile and isfile(configFile) then
+    local success, data = pcall(readfile, configFile)
     if success then
-        for k, v in pairs(decoded) do
-            savedConfig[k] = v
+        local decodeSuccess, decoded = pcall(HttpService.JSONDecode, HttpService, data)
+        if decodeSuccess and typeof(decoded) == "table" then
+            for k, v in pairs(decoded) do
+                if savedConfig[k] ~= nil then
+                    savedConfig[k] = v
+                end
+            end
         end
     end
 end
 
--- Cleanup any previous GUI
+-- === UI SETUP ===
 pcall(function()
-    CoreGui:FindFirstChild("JokiWebhookUI_ScreenGui"):Destroy()
+    game:GetService("CoreGui"):FindFirstChild("JokiWebhookUI_ScreenGui"):Destroy()
 end)
 
--- GUI Setup
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "JokiWebhookUI_ScreenGui"
 screenGui.ResetOnSpawn = false
 screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
-screenGui.Parent = CoreGui
+screenGui.Parent = game:GetService("CoreGui")
 
 local mainFrame = Instance.new("Frame")
 mainFrame.Name = "MainFrame"
@@ -62,19 +66,17 @@ frameCorner.Parent = mainFrame
 
 -- Title Bar
 local titleBar = Instance.new("Frame")
-titleBar.Name = "TitleBar"
 titleBar.Size = UDim2.new(1, 0, 0, 30)
 titleBar.BackgroundColor3 = Color3.fromRGB(45, 45, 55)
 titleBar.BorderColor3 = Color3.fromRGB(85, 85, 105)
 titleBar.BorderSizePixel = 1
 titleBar.Parent = mainFrame
 
-local titleBarCorner = Instance.new("UICorner")
-titleBarCorner.CornerRadius = UDim.new(0, 8)
-titleBarCorner.Parent = titleBar
+local titleCorner = Instance.new("UICorner")
+titleCorner.CornerRadius = UDim.new(0, 8)
+titleCorner.Parent = titleBar
 
 local titleLabel = Instance.new("TextLabel")
-titleLabel.Name = "TitleLabel"
 titleLabel.Size = UDim2.fromScale(1, 1)
 titleLabel.Position = UDim2.fromScale(0.5, 0.5)
 titleLabel.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -85,11 +87,9 @@ titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 titleLabel.TextSize = 16
 titleLabel.TextXAlignment = Enum.TextXAlignment.Center
 titleLabel.TextYAlignment = Enum.TextYAlignment.Center
-titleLabel.ZIndex = 2
 titleLabel.Parent = titleBar
 
 local closeButton = Instance.new("TextButton")
-closeButton.Name = "CloseButton"
 closeButton.Size = UDim2.new(0, 24, 0, 24)
 closeButton.Position = UDim2.new(1, -6, 0, 3)
 closeButton.AnchorPoint = Vector2.new(1, 0)
@@ -110,7 +110,6 @@ end)
 
 -- Content Frame
 local contentFrame = Instance.new("Frame")
-contentFrame.Name = "ContentFrame"
 contentFrame.Size = UDim2.new(1, 0, 1, -30)
 contentFrame.Position = UDim2.new(0, 0, 0, 30)
 contentFrame.BackgroundTransparency = 1
@@ -126,17 +125,15 @@ local uiPadding = Instance.new("UIPadding")
 uiPadding.PaddingTop = UDim.new(0, 10)
 uiPadding.Parent = contentFrame
 
--- Input Helper
+-- Input Creator
 local function createLabeledInput(name, placeholder, order, isNumber)
     local container = Instance.new("Frame")
-    container.Name = name .. "Container"
     container.Size = UDim2.new(0.9, 0, 0, 50)
     container.BackgroundTransparency = 1
     container.LayoutOrder = order
     container.Parent = contentFrame
 
     local label = Instance.new("TextLabel")
-    label.Name = name .. "Label"
     label.Size = UDim2.new(1, 0, 0, 20)
     label.BackgroundTransparency = 1
     label.Text = name
@@ -147,7 +144,6 @@ local function createLabeledInput(name, placeholder, order, isNumber)
     label.Parent = container
 
     local textbox = Instance.new("TextBox")
-    textbox.Name = name .. "Box"
     textbox.Size = UDim2.new(1, 0, 0, 30)
     textbox.Position = UDim2.new(0, 0, 0, 20)
     textbox.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
@@ -175,9 +171,28 @@ local webhookBox = createLabeledInput("discord_webhook", "Paste your Discord Web
 local orderBox = createLabeledInput("no_order", "e.g., OD000000141403135", 3, false)
 local storeNameBox = createLabeledInput("nama_store", "e.g., AfkarStore", 4, false)
 
+-- Auto-Save Config (on input change)
+local function saveConfig()
+    if not canUseFile then return end
+    local configToSave = {
+        jam_selesai_joki = tonumber(jamSelesaiBox.Text) or 1,
+        discord_webhook = webhookBox.Text,
+        no_order = orderBox.Text,
+        nama_store = storeNameBox.Text
+    }
+    local success, encoded = pcall(HttpService.JSONEncode, HttpService, configToSave)
+    if success then
+        pcall(writefile, configFile, encoded)
+    end
+end
+
+jamSelesaiBox.FocusLost:Connect(saveConfig)
+webhookBox.FocusLost:Connect(saveConfig)
+orderBox.FocusLost:Connect(saveConfig)
+storeNameBox.FocusLost:Connect(saveConfig)
+
 -- Execute Button
 local executeButton = Instance.new("TextButton")
-executeButton.Name = "ExecuteButton"
 executeButton.Size = UDim2.new(0.9, 0, 0, 40)
 executeButton.BackgroundColor3 = Color3.fromRGB(88, 101, 242)
 executeButton.BorderColor3 = Color3.fromRGB(120, 130, 255)
@@ -208,15 +223,6 @@ executeButton.MouseButton1Click:Connect(function()
         executeButton.BackgroundColor3 = Color3.fromRGB(88, 101, 242)
         return
     end
-
-    -- Save config
-    local configToSave = {
-        jam_selesai_joki = jamSelesai,
-        discord_webhook = webhookUrl,
-        no_order = orderId,
-        nama_store = storeName
-    }
-    writefile(configFile, HttpService:JSONEncode(configToSave))
 
     executeButton.Active = false
     executeButton.Text = "EXECUTING..."
@@ -257,18 +263,24 @@ executeButton.MouseButton1Click:Connect(function()
         %s
     ]], jamSelesai, webhookUrl, orderId, storeName, webhookScript, iyScript)
 
-    local loadSuccess, loadError = pcall(function()
-        loadstring(finalScript)()
-    end)
+    local loadFunc, compileError = loadstring(finalScript)
+    if not loadFunc then
+        warn("loadstring failed:", compileError)
+        executeButton.Text = "SCRIPT ERROR"
+        executeButton.BackgroundColor3 = Color3.fromRGB(237, 66, 69)
+        wait(3)
+        goto reset
+    end
 
-    if loadSuccess then
+    local success, runtimeError = pcall(loadFunc)
+    if success then
         executeButton.Text = "SUCCESS!"
         executeButton.BackgroundColor3 = Color3.fromRGB(87, 242, 135)
         wait(2)
     else
+        warn("Script runtime error:", runtimeError)
         executeButton.Text = "EXECUTION ERROR"
         executeButton.BackgroundColor3 = Color3.fromRGB(237, 66, 69)
-        warn("Script execution error:", loadError)
         wait(3)
     end
 
