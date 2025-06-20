@@ -220,10 +220,10 @@ executeBtn.MouseButton1Click:Connect(function()
     end
 
     local injectedVars = string.format([[
-        local jam_selesai_joki = %s
-        local discord_webhook = %q
-        local no_order = %q
-        local nama_store = %q
+        _G.jam_selesai_joki = %s
+        _G.discord_webhook = %q
+        _G.no_order = %q
+        _G.nama_store = %q
     ]], jam_selesai_joki, discord_webhook, no_order, nama_store)
 
     local finalScript = string.format([[
