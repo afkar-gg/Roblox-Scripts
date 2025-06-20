@@ -1,4 +1,4 @@
--- All-in-One UI with Config Auto Save/Load + Script Execution
+-- All-in-One UI with Config Save/Load + Webhook Execution
 
 if not game:IsLoaded() then game.Loaded:Wait() end
 if not game:GetService("Players").LocalPlayer then
@@ -18,7 +18,7 @@ local savedConfig = {
     nama_store = ""
 }
 
--- Load from config file
+-- Load config if file exists
 if canUseFile and isfile(configFile) then
     local success, content = pcall(readfile, configFile)
     if success then
@@ -117,7 +117,7 @@ local padding = Instance.new("UIPadding")
 padding.PaddingTop = UDim.new(0, 10)
 padding.Parent = content
 
--- Input Field Helper
+-- Input Helper
 local function makeInput(name, placeholder, order, defaultValue)
     local container = Instance.new("Frame")
     container.Size = UDim2.new(0.9, 0, 0, 50)
@@ -157,13 +157,13 @@ local function makeInput(name, placeholder, order, defaultValue)
     return box
 end
 
--- Inputs with default config values
+-- Input Boxes
 local jamSelesaiBox = makeInput("jam_selesai_joki", "e.g., 1", 1, savedConfig.jam_selesai_joki)
 local webhookBox = makeInput("discord_webhook", "Paste your Discord Webhook", 2, savedConfig.discord_webhook)
 local orderBox = makeInput("no_order", "e.g., OD0000000001", 3, savedConfig.no_order)
 local storeBox = makeInput("nama_store", "e.g., AfkarStore", 4, savedConfig.nama_store)
 
--- Save Config Function
+-- Save Function
 local function saveConfig()
     if not canUseFile then return end
     local data = {
@@ -180,7 +180,7 @@ local function saveConfig()
     end
 end
 
--- Auto-save when editing fields
+-- Auto-save when inputs lose focus
 jamSelesaiBox.FocusLost:Connect(saveConfig)
 webhookBox.FocusLost:Connect(saveConfig)
 orderBox.FocusLost:Connect(saveConfig)
@@ -203,7 +203,7 @@ local btnCorner = Instance.new("UICorner")
 btnCorner.CornerRadius = UDim.new(0, 6)
 btnCorner.Parent = executeBtn
 
--- Run logic
+-- Execution logic
 executeBtn.MouseButton1Click:Connect(function()
     local jam_selesai_joki = tonumber(jamSelesaiBox.Text) or 1
     local discord_webhook = webhookBox.Text
@@ -219,21 +219,17 @@ executeBtn.MouseButton1Click:Connect(function()
         return
     end
 
-    local injectedVars = string.format([[
-    _G.jam_selesai_joki = %s
-    _G.discord_webhook = %q
-    _G.no_order = %q
-    _G.nama_store = %q
-    ]], jam_selesai_joki, discord_webhook, no_order, nama_store)
+    -- Inject _G variables and execute Webhook.lua
+    local scriptToRun = string.format([[
+_G.jam_selesai_joki = %s
+_G.discord_webhook = %q
+_G.no_order = %q
+_G.nama_store = %q
 
-    local finalScript = string.format([[
-    %s
+loadstring(game:HttpGet("https://raw.githubusercontent.com/afkar-gg/Roblox-Scripts/refs/heads/main/Webhook-Joki/Webhook.lua"))();
+]], jam_selesai_joki, discord_webhook, no_order, nama_store)
 
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/afkar-gg/Roblox-Scripts/refs/heads/main/Webhook-Joki/Webhook.lua"))();
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))();
-    ]], injectedVars)
-
-    local func, err = loadstring(finalScript)
+    local func, err = loadstring(scriptToRun)
     if not func then
         warn("loadstring error:", err)
         return
