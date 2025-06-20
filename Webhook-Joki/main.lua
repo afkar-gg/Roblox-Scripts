@@ -179,19 +179,22 @@ minimizeButton.MouseButton1Click:Connect(function()
         local transparency = fadeOut and 1 or 0
     
         for _, child in frame:GetDescendants() do
-            if child:IsA("TextLabel") or child:IsA("TextBox") or child:IsA("TextButton") then
-                -- Final fix: kill background flash
-                child.BackgroundTransparency = 1
-                child.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
-    
+            if child:IsA("TextLabel") then
                 TweenService:Create(child, TweenInfo.new(0.25), {
                     TextTransparency = transparency
                 }):Play()
+                child.BackgroundTransparency = 1 -- force invis background
+            elseif child:IsA("TextBox") or child:IsA("TextButton") then
+                -- No transparency tween — we disable background fade to avoid glitch
+                child.BackgroundTransparency = 0
+                child.TextTransparency = transparency
             elseif child:IsA("Frame") then
-                -- Frames can safely fade background
-                TweenService:Create(child, TweenInfo.new(0.25), {
-                    BackgroundTransparency = transparency
-                }):Play()
+                -- Optional: only fade non-content frames
+                if child.Name ~= "ContentHolder" then
+                    TweenService:Create(child, TweenInfo.new(0.25), {
+                        BackgroundTransparency = transparency
+                    }):Play()
+                end
             end
         end
     end
