@@ -48,7 +48,7 @@ titleLabel.Text = "Webhook Joki Configuration"
 titleLabel.Font = Enum.Font.SourceSansBold
 titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 titleLabel.TextSize = 16
-titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+titleLabel.TextXAlignment = Enum.TextXAlignment.Center
 titleLabel.Parent = mainFrame
 
 local titleCorner = Instance.new("UICorner")
@@ -58,8 +58,8 @@ titleCorner.Parent = titleLabel
 -- Close Button
 local closeButton = Instance.new("TextButton")
 closeButton.Name = "CloseButton"
-closeButton.Size = UDim2.new(0, 22, 0, 22)
-closeButton.Position = UDim2.new(1, -8, 0, 4)
+closeButton.Size = UDim2.new(0, 24, 0, 24)
+closeButton.Position = UDim2.new(1, -4, 0, 4)
 closeButton.AnchorPoint = Vector2.new(1, 0)
 closeButton.BackgroundColor3 = Color3.fromRGB(231, 76, 60)
 closeButton.Text = "X"
