@@ -38,7 +38,7 @@ end
 
 
 local embed = {
-    ["title"] = "JOKI STARTED,
+    ["title"] = "JOKI STARTED",
     ["description"] = "Username : ||" .. username.. "||", -- Concatenate "Username : " with the username variable
     ["color"] = 65280,
     ["fields"] = {
@@ -55,4 +55,4 @@ local embed = {
         ["text"] = "- " ..nama_store.. " ❤️"
     }
 }
-SendMessageEMBED(url, embed)
+SendMessageEMBED(discord_webhook, embed)
