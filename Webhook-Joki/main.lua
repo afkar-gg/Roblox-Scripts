@@ -165,75 +165,49 @@ createTabButton("Webhook", 1)
 createTabButton("Tools", 2)
 
 -- Minimize Fix (FINAL WORKING VERSION ✅)
-local originalPositions = {}
+local function buildContent()
+    -- Recreate the webhook content container and its elements
+    webhookContent = Instance.new("Frame")
+    -- set properties, layout, children (textboxes, execute button) etc.
+    -- same for toolsContent and Infinite Yield button
+    -- make sure to rewire their events, fades, and saved state
+    -- ...
+end
 
 minimizeButton.MouseButton1Click:Connect(function()
-    local fadeTime = 0.25
-    local tweenInfo = TweenInfo.new(fadeTime)
     state.minimized = not state.minimized
     saveConfig(state)
 
     tabHolder.Visible = not state.minimized
 
-    local function tweenFade(frame, fadeOut)
-        local transparency = fadeOut and 1 or 0
-    
-        for _, child in frame:GetDescendants() do
-            if child:IsA("TextLabel") then
-                TweenService:Create(child, TweenInfo.new(0.25), {
-                    TextTransparency = transparency
-                }):Play()
-                child.BackgroundTransparency = 1 -- force invis background
-            elseif child:IsA("TextBox") or child:IsA("TextButton") then
-                -- No transparency tween — we disable background fade to avoid glitch
-                child.BackgroundTransparency = 0
-                child.TextTransparency = transparency
-            elseif child:IsA("Frame") then
-                -- Optional: only fade non-content frames
-                if child.Name ~= "ContentHolder" then
-                    TweenService:Create(child, TweenInfo.new(0.25), {
-                        BackgroundTransparency = transparency
-                    }):Play()
-                end
-            end
-        end
-    end
+    -- fadeText only
+    local fadeTime = 0.25
+    TweenService:Create(mainFrame, TweenInfo.new(fadeTime), {
+        Size = state.minimized and UDim2.new(0, 400, 0, minimizedHeight)
+                            or UDim2.new(0, 400, 0, fullHeight)
+    }):Play()
 
     if state.minimized then
-        -- FADE OUT first
-        if state.activeTab == "Webhook" then
-            tweenFade(webhookContent, true)
-        else
-            tweenFade(toolsContent, true)
-        end
-
-        -- THEN minimize frame
+        -- Fade-out old content, then destroy
+        TweenService:Create(webhookContent, TweenInfo.new(0.25), {
+            BackgroundTransparency = 1
+        }):Play()
         task.delay(fadeTime, function()
-            TweenService:Create(mainFrame, tweenInfo, {
-                Size = UDim2.new(0, 400, 0, minimizedHeight)
-            }):Play()
-            webhookContent.Visible = false
-            toolsContent.Visible = false
+            webhookContent:Destroy()
+            toolsContent:Destroy()
         end)
 
     else
-        -- First resize back
-        TweenService:Create(mainFrame, tweenInfo, {
-            Size = UDim2.new(0, 400, 0, fullHeight)
-        }):Play()
-
-        -- THEN fade back in
-        task.delay(fadeTime, function()
-            if state.activeTab == "Webhook" then
-                webhookContent.Visible = true
-                tweenFade(webhookContent, false)
-            else
-                toolsContent.Visible = true
-                tweenFade(toolsContent, false)
-            end
+        -- Rebuild fresh content and fade it in
+        buildContent()
+        task.delay(0.05, function()
+            TweenService:Create(webhookContent, TweenInfo.new(0.25), {
+                BackgroundTransparency = 0
+            }):Play()
         end)
     end
 end)
+
 
 
 
