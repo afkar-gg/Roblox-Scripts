@@ -171,24 +171,25 @@ minimizeButton.MouseButton1Click:Connect(function()
 
     local targetSize = state.minimized and UDim2.new(0, 400, 0, minimizedHeight) or UDim2.new(0, 400, 0, fullHeight)
     TweenService:Create(mainFrame, TweenInfo.new(0.25), {Size = targetSize}):Play()
-
     tabHolder.Visible = not state.minimized
 
-    -- Fade helper for frames & child text
+    -- Helper to fade frame + all GuiObjects
     local function tweenFade(frame, fadeOut)
-        TweenService:Create(frame, TweenInfo.new(0.25), {
-            BackgroundTransparency = fadeOut and 1 or 0
-        }):Play()
-        for _, child in ipairs(frame:GetChildren()) do
-            if child:IsA("TextLabel") or child:IsA("TextButton") or child:IsA("TextBox") then
+        local transparency = fadeOut and 1 or 0
+        TweenService:Create(frame, TweenInfo.new(0.25), {BackgroundTransparency = transparency}):Play()
+
+        for _, child in frame:GetDescendants() do
+            if child:IsA("TextLabel") or child:IsA("TextBox") or child:IsA("TextButton") then
                 TweenService:Create(child, TweenInfo.new(0.25), {
-                    TextTransparency = fadeOut and 1 or 0,
-                    BackgroundTransparency = fadeOut and 1 or 0
+                    TextTransparency = transparency,
+                    BackgroundTransparency = transparency
                 }):Play()
             elseif child:IsA("Frame") then
                 TweenService:Create(child, TweenInfo.new(0.25), {
-                    BackgroundTransparency = fadeOut and 1 or 0
+                    BackgroundTransparency = transparency
                 }):Play()
+            elseif child:IsA("UICorner") then
+                -- Skip corners
             end
         end
     end
@@ -199,6 +200,7 @@ minimizeButton.MouseButton1Click:Connect(function()
         else
             tweenFade(toolsContent, true)
         end
+
         task.delay(0.25, function()
             webhookContent.Visible = false
             toolsContent.Visible = false
