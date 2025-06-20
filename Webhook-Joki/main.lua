@@ -1,4 +1,4 @@
--- All-in-One UI: Webhook + Infinite Yield, Clean Version
+-- All-in-One UI with Config Auto Save/Load + Script Execution
 
 if not game:IsLoaded() then game.Loaded:Wait() end
 if not game:GetService("Players").LocalPlayer then
@@ -6,12 +6,40 @@ if not game:GetService("Players").LocalPlayer then
     return
 end
 
--- Destroy old UI
+-- ==== CONFIG SETUP ====
+local HttpService = game:GetService("HttpService")
+local configFile = "joki_config.json"
+local canUseFile = (readfile and writefile and isfile) and true or false
+
+local savedConfig = {
+    jam_selesai_joki = "1",
+    discord_webhook = "",
+    no_order = "",
+    nama_store = ""
+}
+
+-- Load from config file
+if canUseFile and isfile(configFile) then
+    local success, content = pcall(readfile, configFile)
+    if success then
+        local ok, decoded = pcall(function()
+            return HttpService:JSONDecode(content)
+        end)
+        if ok and typeof(decoded) == "table" then
+            for k, v in pairs(decoded) do
+                if savedConfig[k] ~= nil then
+                    savedConfig[k] = tostring(v)
+                end
+            end
+        end
+    end
+end
+
+-- ==== UI SETUP ====
 pcall(function()
     game:GetService("CoreGui"):FindFirstChild("JokiWebhookUI_ScreenGui"):Destroy()
 end)
 
--- UI setup
 local gui = Instance.new("ScreenGui")
 gui.Name = "JokiWebhookUI_ScreenGui"
 gui.ResetOnSpawn = false
@@ -28,11 +56,11 @@ frame.Active = true
 frame.Draggable = true
 frame.Parent = gui
 
-local corner = Instance.new("UICorner")
-corner.CornerRadius = UDim.new(0, 8)
-corner.Parent = frame
+local frameCorner = Instance.new("UICorner")
+frameCorner.CornerRadius = UDim.new(0, 8)
+frameCorner.Parent = frame
 
--- Title
+-- Title Bar
 local titleBar = Instance.new("Frame")
 titleBar.Size = UDim2.new(1, 0, 0, 30)
 titleBar.BackgroundColor3 = Color3.fromRGB(45, 45, 55)
@@ -40,35 +68,35 @@ titleBar.BorderColor3 = Color3.fromRGB(85, 85, 105)
 titleBar.BorderSizePixel = 1
 titleBar.Parent = frame
 
-local titleText = Instance.new("TextLabel")
-titleText.Size = UDim2.fromScale(1, 1)
-titleText.Position = UDim2.fromScale(0.5, 0.5)
-titleText.AnchorPoint = Vector2.new(0.5, 0.5)
-titleText.BackgroundTransparency = 1
-titleText.Text = "Webhook Joki Configuration"
-titleText.Font = Enum.Font.SourceSansBold
-titleText.TextColor3 = Color3.new(1, 1, 1)
-titleText.TextSize = 16
-titleText.TextXAlignment = Enum.TextXAlignment.Center
-titleText.TextYAlignment = Enum.TextYAlignment.Center
-titleText.Parent = titleBar
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Size = UDim2.fromScale(1, 1)
+titleLabel.Position = UDim2.fromScale(0.5, 0.5)
+titleLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+titleLabel.BackgroundTransparency = 1
+titleLabel.Text = "Webhook Joki Configuration"
+titleLabel.Font = Enum.Font.SourceSansBold
+titleLabel.TextColor3 = Color3.new(1, 1, 1)
+titleLabel.TextSize = 16
+titleLabel.TextXAlignment = Enum.TextXAlignment.Center
+titleLabel.TextYAlignment = Enum.TextYAlignment.Center
+titleLabel.Parent = titleBar
 
-local close = Instance.new("TextButton")
-close.Size = UDim2.new(0, 24, 0, 24)
-close.Position = UDim2.new(1, -6, 0, 3)
-close.AnchorPoint = Vector2.new(1, 0)
-close.BackgroundColor3 = Color3.fromRGB(231, 76, 60)
-close.Text = "X"
-close.Font = Enum.Font.SourceSansBold
-close.TextColor3 = Color3.new(1, 1, 1)
-close.TextSize = 14
-close.Parent = titleBar
+local closeButton = Instance.new("TextButton")
+closeButton.Size = UDim2.new(0, 24, 0, 24)
+closeButton.Position = UDim2.new(1, -6, 0, 3)
+closeButton.AnchorPoint = Vector2.new(1, 0)
+closeButton.BackgroundColor3 = Color3.fromRGB(231, 76, 60)
+closeButton.Text = "X"
+closeButton.Font = Enum.Font.SourceSansBold
+closeButton.TextColor3 = Color3.new(1, 1, 1)
+closeButton.TextSize = 14
+closeButton.Parent = titleBar
 
 local closeCorner = Instance.new("UICorner")
 closeCorner.CornerRadius = UDim.new(0, 6)
-closeCorner.Parent = close
+closeCorner.Parent = closeButton
 
-close.MouseButton1Click:Connect(function()
+closeButton.MouseButton1Click:Connect(function()
     gui.Enabled = false
 end)
 
@@ -90,7 +118,7 @@ padding.PaddingTop = UDim.new(0, 10)
 padding.Parent = content
 
 -- Input Field Helper
-local function makeInput(name, placeholder, order)
+local function makeInput(name, placeholder, order, defaultValue)
     local container = Instance.new("Frame")
     container.Size = UDim2.new(0.9, 0, 0, 50)
     container.BackgroundTransparency = 1
@@ -115,7 +143,7 @@ local function makeInput(name, placeholder, order)
     box.BorderSizePixel = 1
     box.Font = Enum.Font.SourceSans
     box.PlaceholderText = placeholder
-    box.Text = ""
+    box.Text = defaultValue or ""
     box.TextColor3 = Color3.new(1, 1, 1)
     box.TextSize = 14
     box.TextWrapped = true
@@ -129,11 +157,34 @@ local function makeInput(name, placeholder, order)
     return box
 end
 
--- Inputs
-local jamSelesaiBox = makeInput("jam_selesai_joki", "e.g., 1", 1)
-local webhookBox = makeInput("discord_webhook", "Paste your Discord Webhook", 2)
-local orderBox = makeInput("no_order", "e.g., OD0000000001", 3)
-local storeBox = makeInput("nama_store", "e.g., AfkarStore", 4)
+-- Inputs with default config values
+local jamSelesaiBox = makeInput("jam_selesai_joki", "e.g., 1", 1, savedConfig.jam_selesai_joki)
+local webhookBox = makeInput("discord_webhook", "Paste your Discord Webhook", 2, savedConfig.discord_webhook)
+local orderBox = makeInput("no_order", "e.g., OD0000000001", 3, savedConfig.no_order)
+local storeBox = makeInput("nama_store", "e.g., AfkarStore", 4, savedConfig.nama_store)
+
+-- Save Config Function
+local function saveConfig()
+    if not canUseFile then return end
+    local data = {
+        jam_selesai_joki = jamSelesaiBox.Text,
+        discord_webhook = webhookBox.Text,
+        no_order = orderBox.Text,
+        nama_store = storeBox.Text
+    }
+    local success, json = pcall(function()
+        return HttpService:JSONEncode(data)
+    end)
+    if success then
+        pcall(writefile, configFile, json)
+    end
+end
+
+-- Auto-save when editing fields
+jamSelesaiBox.FocusLost:Connect(saveConfig)
+webhookBox.FocusLost:Connect(saveConfig)
+orderBox.FocusLost:Connect(saveConfig)
+storeBox.FocusLost:Connect(saveConfig)
 
 -- Execute Button
 local executeBtn = Instance.new("TextButton")
@@ -168,7 +219,6 @@ executeBtn.MouseButton1Click:Connect(function()
         return
     end
 
-    -- Build injected script
     local injectedVars = string.format([[
         local jam_selesai_joki = %s
         local discord_webhook = %q
@@ -176,7 +226,6 @@ executeBtn.MouseButton1Click:Connect(function()
         local nama_store = %q
     ]], jam_selesai_joki, discord_webhook, no_order, nama_store)
 
-    -- Webhook first, then Infinite Yield
     local finalScript = string.format([[
         %s
 
