@@ -2,6 +2,11 @@ local Players = game:GetService("Players") -- Get the Players service
 local LocalPlayer = Players.LocalPlayer -- Get the local player (the client playing the game)
 local username = LocalPlayer.Name -- Get the player's username
 
+local jam_selesai_joki = _G.jam_selesai_joki
+local discord_webhook = _G.discord_webhook
+local no_order = _G.no_order
+local nama_store = _G.nama_store
+
 local new_string = string.sub(no_order, 9) -- Start from the 9th character to get the numbers after "OD000000"
 
 
