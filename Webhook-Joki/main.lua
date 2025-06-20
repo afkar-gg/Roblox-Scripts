@@ -168,74 +168,65 @@ createTabButton("Tools", 2)
 local originalPositions = {}
 
 minimizeButton.MouseButton1Click:Connect(function()
+    local fadeTime = 0.25
+    local tweenInfo = TweenInfo.new(fadeTime)
     state.minimized = not state.minimized
     saveConfig(state)
 
-    local targetSize = state.minimized and UDim2.new(0, 400, 0, minimizedHeight) or UDim2.new(0, 400, 0, fullHeight)
-    TweenService:Create(mainFrame, TweenInfo.new(0.25), {Size = targetSize}):Play()
     tabHolder.Visible = not state.minimized
-
-    local function tweenCollapse(container, toPosition, collapse)
-        for _, child in container:GetChildren() do
-            if child:IsA("Frame") or child:IsA("TextButton") then
-                if collapse then
-                    -- Save original position before collapsing
-                    originalPositions[child] = child.Position
-                    TweenService:Create(child, TweenInfo.new(0.25), {
-                        Position = toPosition
-                    }):Play()
-                else
-                    local original = originalPositions[child]
-                    if original then
-                        TweenService:Create(child, TweenInfo.new(0.25), {
-                            Position = original
-                        }):Play()
-                    end
-                end
-            end
-        end
-    end
 
     local function tweenFade(frame, fadeOut)
         local transparency = fadeOut and 1 or 0
         for _, child in frame:GetDescendants() do
             if child:IsA("TextLabel") or child:IsA("TextBox") or child:IsA("TextButton") then
-                TweenService:Create(child, TweenInfo.new(0.25), {
+                TweenService:Create(child, tweenInfo, {
                     TextTransparency = transparency,
                     BackgroundTransparency = transparency
                 }):Play()
             elseif child:IsA("Frame") then
-                TweenService:Create(child, TweenInfo.new(0.25), {
+                TweenService:Create(child, tweenInfo, {
                     BackgroundTransparency = transparency
                 }):Play()
             end
         end
     end
 
-    local jamPos = jamSelesaiBox.Parent.Position
-
     if state.minimized then
+        -- FADE OUT first
         if state.activeTab == "Webhook" then
-            tweenCollapse(webhookContent, jamPos, true)
             tweenFade(webhookContent, true)
         else
             tweenFade(toolsContent, true)
         end
-        task.delay(0.25, function()
+
+        -- THEN minimize frame
+        task.delay(fadeTime, function()
+            TweenService:Create(mainFrame, tweenInfo, {
+                Size = UDim2.new(0, 400, 0, minimizedHeight)
+            }):Play()
             webhookContent.Visible = false
             toolsContent.Visible = false
         end)
+
     else
-        if state.activeTab == "Webhook" then
-            webhookContent.Visible = true
-            tweenCollapse(webhookContent, jamPos, false)
-            tweenFade(webhookContent, false)
-        else
-            toolsContent.Visible = true
-            tweenFade(toolsContent, false)
-        end
+        -- First resize back
+        TweenService:Create(mainFrame, tweenInfo, {
+            Size = UDim2.new(0, 400, 0, fullHeight)
+        }):Play()
+
+        -- THEN fade back in
+        task.delay(fadeTime, function()
+            if state.activeTab == "Webhook" then
+                webhookContent.Visible = true
+                tweenFade(webhookContent, false)
+            else
+                toolsContent.Visible = true
+                tweenFade(toolsContent, false)
+            end
+        end)
     end
 end)
+
 
 
 -- Initialize tab visibility
