@@ -175,6 +175,23 @@ local webhookBox = createLabeledInput("discord_webhook", "Paste your Discord Web
 local orderBox = createLabeledInput("no_order", "e.g., OD000000141403135", 3, false)
 local storeNameBox = createLabeledInput("nama_store", "e.g., AfkarStore", 4, false)
 
+-- Auto-save function
+local function saveConfig()
+    local configToSave = {
+        jam_selesai_joki = tonumber(jamSelesaiBox.Text) or 1,
+        discord_webhook = webhookBox.Text,
+        no_order = orderBox.Text,
+        nama_store = storeNameBox.Text
+    }
+    writefile(configFile, HttpService:JSONEncode(configToSave))
+end
+
+-- Connect FocusLost events for all input boxes
+jamSelesaiBox.FocusLost:Connect(saveConfig)
+webhookBox.FocusLost:Connect(saveConfig)
+orderBox.FocusLost:Connect(saveConfig)
+storeNameBox.FocusLost:Connect(saveConfig)
+
 -- Execute Button
 local executeButton = Instance.new("TextButton")
 executeButton.Name = "ExecuteButton"
