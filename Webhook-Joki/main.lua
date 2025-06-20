@@ -174,20 +174,25 @@ minimizeButton.MouseButton1Click:Connect(function()
 
     tabHolder.Visible = not state.minimized
 
-    -- Helper to tween all GuiObjects inside a frame
+    -- Fade helper for frames & child text
     local function tweenFade(frame, fadeOut)
+        TweenService:Create(frame, TweenInfo.new(0.25), {
+            BackgroundTransparency = fadeOut and 1 or 0
+        }):Play()
         for _, child in ipairs(frame:GetChildren()) do
             if child:IsA("TextLabel") or child:IsA("TextButton") or child:IsA("TextBox") then
-                local goal = {TextTransparency = fadeOut and 1 or 0}
-                TweenService:Create(child, TweenInfo.new(0.25), goal):Play()
+                TweenService:Create(child, TweenInfo.new(0.25), {
+                    TextTransparency = fadeOut and 1 or 0,
+                    BackgroundTransparency = fadeOut and 1 or 0
+                }):Play()
             elseif child:IsA("Frame") then
-                local goal = {BackgroundTransparency = fadeOut and 1 or 0}
-                TweenService:Create(child, TweenInfo.new(0.25), goal):Play()
+                TweenService:Create(child, TweenInfo.new(0.25), {
+                    BackgroundTransparency = fadeOut and 1 or 0
+                }):Play()
             end
         end
     end
 
-    -- Fade out current tab content
     if state.minimized then
         if state.activeTab == "Webhook" then
             tweenFade(webhookContent, true)
@@ -208,6 +213,7 @@ minimizeButton.MouseButton1Click:Connect(function()
         end
     end
 end)
+
 
 
 -- Initialize tab visibility
