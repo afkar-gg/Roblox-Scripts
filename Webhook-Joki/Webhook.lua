@@ -5,24 +5,6 @@ local username = LocalPlayer.Name -- Get the player's username
 local new_string = string.sub(no_order, 9) -- Start from the 9th character to get the numbers after "OD000000"
 
 
-function SendMessage(url, message)
-    local http = game:GetService("HttpService")
-    local headers = {
-        ["Content-Type"] = "application/json"
-    }
-    local data = {
-        ["content"] = message
-    }
-    local body = http:JSONEncode(data)
-    local response = request({
-        Url = url,
-        Method = "POST",
-        Headers = headers,
-        Body = body
-    })
-    print("Sent")
-end
-
 function SendMessageEMBED(url, embed)
     local http = game:GetService("HttpService")
     local headers = {
