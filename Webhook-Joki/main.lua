@@ -91,8 +91,8 @@ tabHolder.BackgroundTransparency = 1
 
 local function createTabButton(name, order)
     local button = Instance.new("TextButton", tabHolder)
-    button.Size = UDim2.new(0.5, 0, 1, 0)
-    button.Position = UDim2.new((order - 1) * 0.5, 0, 0, 0)
+    button.Size = UDim2.new(1/3, 0, 1, 0) -- 👈 Each tab takes 1/3 of tab bar
+    button.Position = UDim2.new((order - 1) * (1/3), 0, 0, 0)
     button.Text = name
     button.Font = Enum.Font.SourceSansBold
     button.TextSize = 14
