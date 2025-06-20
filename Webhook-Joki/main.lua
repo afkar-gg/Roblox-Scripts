@@ -21,7 +21,15 @@ local defaultConfig = {
     nama_store = ""
 }
 
-local savedConfig = table.clone(defaultConfig)
+local function shallowCopy(tbl)
+    local copy = {}
+    for k, v in pairs(tbl) do
+        copy[k] = v
+    end
+    return copy
+end
+
+local savedConfig = shallowCopy(defaultConfig)
 
 if canUseFile and isfile(configFile) then
     local success, data = pcall(readfile, configFile)
