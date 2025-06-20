@@ -1,5 +1,5 @@
 --[[
-    Webhook UI Script with Infinite Yield + Auto-Save Config on Edit
+    All-in-One UI Script with Auto-Save, Webhook Execution, Infinite Yield
     Designed for executor-based development/testing
 --]]
 
@@ -21,7 +21,7 @@ local savedConfig = {
     nama_store = ""
 }
 
--- Load config from file
+-- Load saved config
 if pcall(function() return readfile(configFile) end) then
     local success, decoded = pcall(function()
         return HttpService:JSONDecode(readfile(configFile))
@@ -33,12 +33,12 @@ if pcall(function() return readfile(configFile) end) then
     end
 end
 
--- Destroy existing UI if any
+-- Cleanup any previous GUI
 pcall(function()
     CoreGui:FindFirstChild("JokiWebhookUI_ScreenGui"):Destroy()
 end)
 
--- Create UI
+-- GUI Setup
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "JokiWebhookUI_ScreenGui"
 screenGui.ResetOnSpawn = false
@@ -169,27 +169,11 @@ local function createLabeledInput(name, placeholder, order, isNumber)
     return textbox
 end
 
--- Create input fields
+-- Inputs
 local jamSelesaiBox = createLabeledInput("jam_selesai_joki", "e.g., 1", 1, true)
 local webhookBox = createLabeledInput("discord_webhook", "Paste your Discord Webhook URL here", 2, false)
 local orderBox = createLabeledInput("no_order", "e.g., OD000000141403135", 3, false)
 local storeNameBox = createLabeledInput("nama_store", "e.g., AfkarStore", 4, false)
-
--- Auto-save config on input change
-local function saveConfig()
-    local configToSave = {
-        jam_selesai_joki = tonumber(jamSelesaiBox.Text) or 1,
-        discord_webhook = webhookBox.Text,
-        no_order = orderBox.Text,
-        nama_store = storeNameBox.Text
-    }
-    writefile(configFile, HttpService:JSONEncode(configToSave))
-end
-
-jamSelesaiBox.FocusLost:Connect(saveConfig)
-webhookBox.FocusLost:Connect(saveConfig)
-orderBox.FocusLost:Connect(saveConfig)
-storeNameBox.FocusLost:Connect(saveConfig)
 
 -- Execute Button
 local executeButton = Instance.new("TextButton")
@@ -209,7 +193,7 @@ local buttonCorner = Instance.new("UICorner")
 buttonCorner.CornerRadius = UDim.new(0, 6)
 buttonCorner.Parent = executeButton
 
--- Button Logic
+-- Execute Logic
 executeButton.MouseButton1Click:Connect(function()
     local jamSelesai = tonumber(jamSelesaiBox.Text) or 1
     local webhookUrl = webhookBox.Text
@@ -224,6 +208,15 @@ executeButton.MouseButton1Click:Connect(function()
         executeButton.BackgroundColor3 = Color3.fromRGB(88, 101, 242)
         return
     end
+
+    -- Save config
+    local configToSave = {
+        jam_selesai_joki = jamSelesai,
+        discord_webhook = webhookUrl,
+        no_order = orderId,
+        nama_store = storeName
+    }
+    writefile(configFile, HttpService:JSONEncode(configToSave))
 
     executeButton.Active = false
     executeButton.Text = "EXECUTING..."
