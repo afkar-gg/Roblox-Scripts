@@ -1,7 +1,7 @@
 --[[
-    All-in-One UI Script for Webhook Execution + Infinite Yield
-    Fixed layout issue where title bar was offset by UIListLayout
-]]
+    All-in-One UI Script with Auto-Save, Webhook Execution, Infinite Yield
+    Designed for executor-based development/testing
+--]]
 
 if not game:IsLoaded() then game.Loaded:Wait() end
 if not game:GetService("Players").LocalPlayer then
@@ -9,19 +9,42 @@ if not game:GetService("Players").LocalPlayer then
     return
 end
 
--- Cleanup existing UI
+-- Services & Config
+local CoreGui = game:GetService("CoreGui")
+local HttpService = game:GetService("HttpService")
+local configFile = "joki_config.json"
+
+local savedConfig = {
+    jam_selesai_joki = 1,
+    discord_webhook = "",
+    no_order = "",
+    nama_store = ""
+}
+
+-- Load saved config
+if pcall(function() return readfile(configFile) end) then
+    local success, decoded = pcall(function()
+        return HttpService:JSONDecode(readfile(configFile))
+    end)
+    if success then
+        for k, v in pairs(decoded) do
+            savedConfig[k] = v
+        end
+    end
+end
+
+-- Cleanup any previous GUI
 pcall(function()
-    game:GetService("CoreGui"):FindFirstChild("JokiWebhookUI_ScreenGui"):Destroy()
+    CoreGui:FindFirstChild("JokiWebhookUI_ScreenGui"):Destroy()
 end)
 
--- ScreenGui
+-- GUI Setup
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "JokiWebhookUI_ScreenGui"
 screenGui.ResetOnSpawn = false
 screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
-screenGui.Parent = game:GetService("CoreGui")
+screenGui.Parent = CoreGui
 
--- Main Frame
 local mainFrame = Instance.new("Frame")
 mainFrame.Name = "MainFrame"
 mainFrame.Size = UDim2.new(0, 400, 0, 350)
@@ -37,7 +60,7 @@ local frameCorner = Instance.new("UICorner")
 frameCorner.CornerRadius = UDim.new(0, 8)
 frameCorner.Parent = mainFrame
 
--- Title Bar Container
+-- Title Bar
 local titleBar = Instance.new("Frame")
 titleBar.Name = "TitleBar"
 titleBar.Size = UDim2.new(1, 0, 0, 30)
@@ -50,7 +73,6 @@ local titleBarCorner = Instance.new("UICorner")
 titleBarCorner.CornerRadius = UDim.new(0, 8)
 titleBarCorner.Parent = titleBar
 
--- Centered Title Label
 local titleLabel = Instance.new("TextLabel")
 titleLabel.Name = "TitleLabel"
 titleLabel.Size = UDim2.fromScale(1, 1)
@@ -66,7 +88,6 @@ titleLabel.TextYAlignment = Enum.TextYAlignment.Center
 titleLabel.ZIndex = 2
 titleLabel.Parent = titleBar
 
--- Close Button (Top-Right Corner)
 local closeButton = Instance.new("TextButton")
 closeButton.Name = "CloseButton"
 closeButton.Size = UDim2.new(0, 24, 0, 24)
@@ -87,7 +108,7 @@ closeButton.MouseButton1Click:Connect(function()
     screenGui.Enabled = false
 end)
 
--- Content Frame (holds inputs + button)
+-- Content Frame
 local contentFrame = Instance.new("Frame")
 contentFrame.Name = "ContentFrame"
 contentFrame.Size = UDim2.new(1, 0, 1, -30)
@@ -95,7 +116,6 @@ contentFrame.Position = UDim2.new(0, 0, 0, 30)
 contentFrame.BackgroundTransparency = 1
 contentFrame.Parent = mainFrame
 
--- Layout + Padding
 local listLayout = Instance.new("UIListLayout")
 listLayout.Padding = UDim.new(0, 8)
 listLayout.SortOrder = Enum.SortOrder.LayoutOrder
@@ -106,7 +126,7 @@ local uiPadding = Instance.new("UIPadding")
 uiPadding.PaddingTop = UDim.new(0, 10)
 uiPadding.Parent = contentFrame
 
--- Helper for inputs
+-- Input Helper
 local function createLabeledInput(name, placeholder, order, isNumber)
     local container = Instance.new("Frame")
     container.Name = name .. "Container"
@@ -135,7 +155,7 @@ local function createLabeledInput(name, placeholder, order, isNumber)
     textbox.BorderSizePixel = 1
     textbox.Font = Enum.Font.SourceSans
     textbox.PlaceholderText = placeholder
-    textbox.Text = isNumber and "1" or ""
+    textbox.Text = isNumber and tostring(savedConfig[name]) or (savedConfig[name] or "")
     textbox.TextColor3 = Color3.fromRGB(255, 255, 255)
     textbox.TextSize = 14
     textbox.ClearTextOnFocus = false
@@ -173,7 +193,7 @@ local buttonCorner = Instance.new("UICorner")
 buttonCorner.CornerRadius = UDim.new(0, 6)
 buttonCorner.Parent = executeButton
 
--- Button Logic
+-- Execute Logic
 executeButton.MouseButton1Click:Connect(function()
     local jamSelesai = tonumber(jamSelesaiBox.Text) or 1
     local webhookUrl = webhookBox.Text
@@ -188,6 +208,15 @@ executeButton.MouseButton1Click:Connect(function()
         executeButton.BackgroundColor3 = Color3.fromRGB(88, 101, 242)
         return
     end
+
+    -- Save config
+    local configToSave = {
+        jam_selesai_joki = jamSelesai,
+        discord_webhook = webhookUrl,
+        no_order = orderId,
+        nama_store = storeName
+    }
+    writefile(configFile, HttpService:JSONEncode(configToSave))
 
     executeButton.Active = false
     executeButton.Text = "EXECUTING..."
@@ -206,10 +235,7 @@ executeButton.MouseButton1Click:Connect(function()
         executeButton.BackgroundColor3 = Color3.fromRGB(237, 66, 69)
         warn("Failed to fetch Webhook.lua:", webhookScript)
         wait(3)
-        executeButton.Active = true
-        executeButton.Text = "EXECUTE SCRIPT"
-        executeButton.BackgroundColor3 = Color3.fromRGB(88, 101, 242)
-        return
+        goto reset
     end
 
     if not success2 or not iyScript then
@@ -217,10 +243,7 @@ executeButton.MouseButton1Click:Connect(function()
         executeButton.BackgroundColor3 = Color3.fromRGB(237, 66, 69)
         warn("Failed to fetch Infinite Yield:", iyScript)
         wait(3)
-        executeButton.Active = true
-        executeButton.Text = "EXECUTE SCRIPT"
-        executeButton.BackgroundColor3 = Color3.fromRGB(88, 101, 242)
-        return
+        goto reset
     end
 
     local finalScript = string.format([[
@@ -249,6 +272,7 @@ executeButton.MouseButton1Click:Connect(function()
         wait(3)
     end
 
+    ::reset::
     executeButton.Active = true
     executeButton.Text = "EXECUTE SCRIPT"
     executeButton.BackgroundColor3 = Color3.fromRGB(88, 101, 242)
