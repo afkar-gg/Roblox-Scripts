@@ -1,4 +1,4 @@
--- Webhook Joki UI (Clean Version) by @Afkar
+-- Webhook Joki UI (Clean Version w/ Text Wrapping) by @Afkar
 
 if not game:IsLoaded() then game.Loaded:Wait() end
 local Players = game:GetService("Players")
@@ -66,6 +66,7 @@ titleBar.Font = Enum.Font.SourceSansBold
 titleBar.TextColor3 = Color3.new(1, 1, 1)
 titleBar.BackgroundTransparency = 1
 titleBar.TextXAlignment = Enum.TextXAlignment.Left
+titleBar.TextWrapped = true
 
 -- Close button (X)
 local closeButton = Instance.new("TextButton", mainFrame)
@@ -76,6 +77,7 @@ closeButton.Font = Enum.Font.SourceSansBold
 closeButton.TextSize = 14
 closeButton.BackgroundColor3 = Color3.fromRGB(231, 76, 60)
 closeButton.TextColor3 = Color3.new(1, 1, 1)
+closeButton.TextWrapped = true
 Instance.new("UICorner", closeButton).CornerRadius = UDim.new(0, 6)
 closeButton.MouseButton1Click:Connect(function()
     screenGui:Destroy()
@@ -96,6 +98,7 @@ local function createTabButton(name, order)
     button.TextSize = 14
     button.TextColor3 = Color3.new(1, 1, 1)
     button.BackgroundColor3 = Color3.fromRGB(88, 101, 242)
+    button.TextWrapped = true
     Instance.new("UICorner", button).CornerRadius = UDim.new(0, 6)
     return button
 end
@@ -141,6 +144,7 @@ local function createInput(labelText, key, order)
     label.TextSize = 14
     label.TextColor3 = Color3.fromRGB(220, 220, 220)
     label.TextXAlignment = Enum.TextXAlignment.Left
+    label.TextWrapped = true
 
     local box = Instance.new("TextBox", container)
     box.Size = UDim2.new(1, 0, 0, 30)
@@ -152,6 +156,7 @@ local function createInput(labelText, key, order)
     box.Text = config.fields[key] or ""
     box.TextSize = 14
     box.TextColor3 = Color3.fromRGB(255, 255, 255)
+    box.TextWrapped = true
     Instance.new("UICorner", box).CornerRadius = UDim.new(0, 4)
 
     box:GetPropertyChangedSignal("Text"):Connect(function()
@@ -174,6 +179,7 @@ executeButton.Text = "EXECUTE SCRIPT"
 executeButton.Font = Enum.Font.SourceSansBold
 executeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 executeButton.TextSize = 18
+executeButton.TextWrapped = true
 Instance.new("UICorner", executeButton).CornerRadius = UDim.new(0, 6)
 
 executeButton.MouseButton1Click:Connect(function()
@@ -221,6 +227,7 @@ iyButton.Text = "Infinite Yield"
 iyButton.Font = Enum.Font.SourceSansBold
 iyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 iyButton.TextSize = 18
+iyButton.TextWrapped = true
 Instance.new("UICorner", iyButton).CornerRadius = UDim.new(0, 6)
 
 iyButton.MouseButton1Click:Connect(function()
