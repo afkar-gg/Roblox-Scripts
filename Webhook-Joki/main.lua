@@ -1,7 +1,6 @@
 --[[
     All-in-One UI Script for Webhook Execution + Infinite Yield
-    - Adds Infinite Yield execution after Webhook.lua
-    - Only for use in your own development environment
+    Fixed layout issue where title bar was offset by UIListLayout
 ]]
 
 if not game:IsLoaded() then game.Loaded:Wait() end
@@ -10,7 +9,7 @@ if not game:GetService("Players").LocalPlayer then
     return
 end
 
--- Cleanup any previous UI
+-- Cleanup existing UI
 pcall(function()
     game:GetService("CoreGui"):FindFirstChild("JokiWebhookUI_ScreenGui"):Destroy()
 end)
@@ -49,6 +48,7 @@ titleLabel.Text = "Webhook Joki Configuration"
 titleLabel.Font = Enum.Font.SourceSansBold
 titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 titleLabel.TextSize = 16
+titleLabel.TextXAlignment = Enum.TextXAlignment.Left
 titleLabel.Parent = mainFrame
 
 local titleCorner = Instance.new("UICorner")
@@ -59,14 +59,14 @@ titleCorner.Parent = titleLabel
 local closeButton = Instance.new("TextButton")
 closeButton.Name = "CloseButton"
 closeButton.Size = UDim2.new(0, 22, 0, 22)
-closeButton.Position = UDim2.new(1, -16, 0.5, 0)
-closeButton.AnchorPoint = Vector2.new(1, 0.5)
+closeButton.Position = UDim2.new(1, -8, 0, 4)
+closeButton.AnchorPoint = Vector2.new(1, 0)
 closeButton.BackgroundColor3 = Color3.fromRGB(231, 76, 60)
 closeButton.Text = "X"
 closeButton.Font = Enum.Font.SourceSansBold
 closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 closeButton.TextSize = 14
-closeButton.Parent = titleLabel
+closeButton.Parent = mainFrame
 
 local closeCorner = Instance.new("UICorner")
 closeCorner.CornerRadius = UDim.new(0, 6)
@@ -76,35 +76,33 @@ closeButton.MouseButton1Click:Connect(function()
     screenGui.Enabled = false
 end)
 
--- Layout + Padding
--- Create a new ContentFrame inside mainFrame
+-- Content Frame (holds inputs + button)
 local contentFrame = Instance.new("Frame")
 contentFrame.Name = "ContentFrame"
-contentFrame.Size = UDim2.new(1, 0, 1, -30) -- Leave space for title bar
+contentFrame.Size = UDim2.new(1, 0, 1, -30)
 contentFrame.Position = UDim2.new(0, 0, 0, 30)
 contentFrame.BackgroundTransparency = 1
 contentFrame.Parent = mainFrame
 
--- UIListLayout inside contentFrame
+-- Layout + Padding
 local listLayout = Instance.new("UIListLayout")
 listLayout.Padding = UDim.new(0, 8)
 listLayout.SortOrder = Enum.SortOrder.LayoutOrder
 listLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 listLayout.Parent = contentFrame
 
--- Padding for contentFrame
 local uiPadding = Instance.new("UIPadding")
 uiPadding.PaddingTop = UDim.new(0, 10)
 uiPadding.Parent = contentFrame
 
--- Input field helper
+-- Helper for inputs
 local function createLabeledInput(name, placeholder, order, isNumber)
     local container = Instance.new("Frame")
     container.Name = name .. "Container"
     container.Size = UDim2.new(0.9, 0, 0, 50)
     container.BackgroundTransparency = 1
     container.LayoutOrder = order
-    container.Parent = mainFrame
+    container.Parent = contentFrame
 
     local label = Instance.new("TextLabel")
     label.Name = name .. "Label"
@@ -158,13 +156,13 @@ executeButton.Font = Enum.Font.SourceSansBold
 executeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 executeButton.TextSize = 18
 executeButton.LayoutOrder = 5
-executeButton.Parent = mainFrame
+executeButton.Parent = contentFrame
 
 local buttonCorner = Instance.new("UICorner")
 buttonCorner.CornerRadius = UDim.new(0, 6)
 buttonCorner.Parent = executeButton
 
--- BUTTON LOGIC
+-- Button Logic
 executeButton.MouseButton1Click:Connect(function()
     local jamSelesai = tonumber(jamSelesaiBox.Text) or 1
     local webhookUrl = webhookBox.Text
