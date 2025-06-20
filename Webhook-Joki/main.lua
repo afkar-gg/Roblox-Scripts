@@ -53,9 +53,9 @@ titleBarCorner.Parent = titleBar
 -- Centered Title Label
 local titleLabel = Instance.new("TextLabel")
 titleLabel.Name = "TitleLabel"
+titleLabel.Size = UDim2.fromScale(1, 1)
+titleLabel.Position = UDim2.fromScale(0.5, 0.5)
 titleLabel.AnchorPoint = Vector2.new(0.5, 0.5)
-titleLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
-titleLabel.Size = UDim2.new(0.8, 0, 1, 0)
 titleLabel.BackgroundTransparency = 1
 titleLabel.Text = "Webhook Joki Configuration"
 titleLabel.Font = Enum.Font.SourceSansBold
@@ -63,6 +63,7 @@ titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 titleLabel.TextSize = 16
 titleLabel.TextXAlignment = Enum.TextXAlignment.Center
 titleLabel.TextYAlignment = Enum.TextYAlignment.Center
+titleLabel.ZIndex = 2
 titleLabel.Parent = titleBar
 
 -- Close Button (Top-Right Corner)
