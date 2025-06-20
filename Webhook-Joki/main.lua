@@ -37,36 +37,46 @@ local frameCorner = Instance.new("UICorner")
 frameCorner.CornerRadius = UDim.new(0, 8)
 frameCorner.Parent = mainFrame
 
--- Title Label
+-- Title Bar Container
+local titleBar = Instance.new("Frame")
+titleBar.Name = "TitleBar"
+titleBar.Size = UDim2.new(1, 0, 0, 30)
+titleBar.BackgroundColor3 = Color3.fromRGB(45, 45, 55)
+titleBar.BorderColor3 = Color3.fromRGB(85, 85, 105)
+titleBar.BorderSizePixel = 1
+titleBar.Parent = mainFrame
+
+local titleBarCorner = Instance.new("UICorner")
+titleBarCorner.CornerRadius = UDim.new(0, 8)
+titleBarCorner.Parent = titleBar
+
+-- Centered Title Label
 local titleLabel = Instance.new("TextLabel")
 titleLabel.Name = "TitleLabel"
-titleLabel.Size = UDim2.new(1, 0, 0, 30)
-titleLabel.BackgroundColor3 = Color3.fromRGB(45, 45, 55)
-titleLabel.BorderColor3 = Color3.fromRGB(85, 85, 105)
-titleLabel.BorderSizePixel = 1
+titleLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+titleLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
+titleLabel.Size = UDim2.new(0.8, 0, 1, 0)
+titleLabel.BackgroundTransparency = 1
 titleLabel.Text = "Webhook Joki Configuration"
 titleLabel.Font = Enum.Font.SourceSansBold
 titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 titleLabel.TextSize = 16
 titleLabel.TextXAlignment = Enum.TextXAlignment.Center
-titleLabel.Parent = mainFrame
+titleLabel.TextYAlignment = Enum.TextYAlignment.Center
+titleLabel.Parent = titleBar
 
-local titleCorner = Instance.new("UICorner")
-titleCorner.CornerRadius = UDim.new(0, 8)
-titleCorner.Parent = titleLabel
-
--- Close Button
+-- Close Button (Top-Right Corner)
 local closeButton = Instance.new("TextButton")
 closeButton.Name = "CloseButton"
 closeButton.Size = UDim2.new(0, 24, 0, 24)
-closeButton.Position = UDim2.new(1, -4, 0, 4)
+closeButton.Position = UDim2.new(1, -6, 0, 3)
 closeButton.AnchorPoint = Vector2.new(1, 0)
 closeButton.BackgroundColor3 = Color3.fromRGB(231, 76, 60)
 closeButton.Text = "X"
 closeButton.Font = Enum.Font.SourceSansBold
 closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 closeButton.TextSize = 14
-closeButton.Parent = mainFrame
+closeButton.Parent = titleBar
 
 local closeCorner = Instance.new("UICorner")
 closeCorner.CornerRadius = UDim.new(0, 6)
