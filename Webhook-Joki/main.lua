@@ -229,9 +229,8 @@ executeBtn.MouseButton1Click:Connect(function()
     local finalScript = string.format([[
     %s
 
-
     loadstring(game:HttpGet("https://raw.githubusercontent.com/afkar-gg/Roblox-Scripts/refs/heads/main/Webhook-Joki/Webhook.lua"))();
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))();
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))();
 ]], injectedVars)
 
     local func, err = loadstring(finalScript)
