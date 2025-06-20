@@ -11,7 +11,7 @@ local edit_url = string.format("%s/messages/%s", dc_webhook, dc_message_id)
 local data = {
     embeds = {{
         title = "Online Checked",
-        description = " Username : " .. username .. " Last Checked : <t:" .. os.time() .. ":R>",
+        description = " Username : " .. username .. "\nLast Checked : <t:" .. os.time() .. ":R>",
         color = 16711680 -- red color (optional)
     }}
 }
