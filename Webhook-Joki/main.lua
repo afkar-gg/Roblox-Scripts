@@ -113,6 +113,95 @@ local toolsTab = webhookTab:Clone()
 toolsTab.Name = "ToolsTab"
 toolsTab.Parent = mainFrame
 
+-- Checker Tab
+local checkerTab = webhookTab:Clone()
+checkerTab.Name = "CheckerTab"
+checkerTab.Parent = mainFrame
+
+local checkerContent = checkerTab:FindFirstChild("ContentHolder")
+checkerContent:ClearAllChildren()
+
+local checkerLayout = Instance.new("UIListLayout", checkerContent)
+checkerLayout.Padding = UDim.new(0, 8)
+checkerLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+
+Instance.new("UIPadding", checkerContent).PaddingTop = UDim.new(0, 5)
+
+-- Checker Inputs
+local function createCheckerInput(labelText, order)
+    local container = Instance.new("Frame", checkerContent)
+    container.Size = UDim2.new(0.9, 0, 0, 50)
+    container.BackgroundTransparency = 1
+    container.LayoutOrder = order
+
+    local label = Instance.new("TextLabel", container)
+    label.Size = UDim2.new(1, 0, 0, 20)
+    label.Text = labelText
+    label.Font = Enum.Font.SourceSans
+    label.TextSize = 14
+    label.TextColor3 = Color3.fromRGB(220, 220, 220)
+    label.BackgroundTransparency = 1
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    label.TextWrapped = true
+
+    local box = Instance.new("TextBox", container)
+    box.Size = UDim2.new(1, 0, 0, 30)
+    box.Position = UDim2.new(0, 0, 0, 20)
+    box.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+    box.BorderColor3 = Color3.fromRGB(85, 85, 105)
+    box.Font = Enum.Font.SourceSans
+    box.PlaceholderText = "Enter value..."
+    box.Text = ""
+    box.TextSize = 14
+    box.TextColor3 = Color3.fromRGB(255, 255, 255)
+    box.TextWrapped = true
+    Instance.new("UICorner", box).CornerRadius = UDim.new(0, 4)
+
+    return box
+end
+
+local webhookCheckerBox = createCheckerInput("dc_webhook", 1)
+local messageCheckerBox = createCheckerInput("dc_message_id", 2)
+
+-- RUN Button
+local runCheckerButton = Instance.new("TextButton", checkerContent)
+runCheckerButton.Size = UDim2.new(0.9, 0, 0, 40)
+runCheckerButton.BackgroundColor3 = Color3.fromRGB(88, 101, 242)
+runCheckerButton.BorderColor3 = Color3.fromRGB(120, 130, 255)
+runCheckerButton.Text = "RUN"
+runCheckerButton.Font = Enum.Font.SourceSansBold
+runCheckerButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+runCheckerButton.TextSize = 18
+runCheckerButton.TextWrapped = true
+Instance.new("UICorner", runCheckerButton).CornerRadius = UDim.new(0, 6)
+
+runCheckerButton.MouseButton1Click:Connect(function()
+    local dc_webhook = webhookCheckerBox.Text
+    local dc_message_id = messageCheckerBox.Text
+
+    if dc_webhook == "" or dc_message_id == "" then
+        runCheckerButton.Text = "FILL BOTH FIELDS"
+        runCheckerButton.BackgroundColor3 = Color3.fromRGB(237, 66, 69)
+        wait(2)
+        runCheckerButton.Text = "RUN"
+        runCheckerButton.BackgroundColor3 = Color3.fromRGB(88, 101, 242)
+        return
+    end
+
+    local scriptToRun = string.format([[
+        local dc_webhook = %q
+        local dc_message_id = %q
+        %s
+    ]],
+        dc_webhook,
+        dc_message_id,
+        game:HttpGet("https://raw.githubusercontent.com/afkar-gg/Roblox-Scripts/main/Webhook-Joki/EditMsg.lua")
+    )
+
+    pcall(function()
+        loadstring(scriptToRun)()
+    end)
+end)
 local webhookContent = Instance.new("Frame", webhookTab)
 webhookContent.Name = "ContentHolder"
 webhookContent.Size = UDim2.new(1, 0, 1, 0)
