@@ -1,5 +1,5 @@
 --[[
-    Webhook Joki UI (Persistent Save Version) By @Afkar
+    Webhook Joki UI (Minimize Fixed + Persistent Save) By @Afkar
 ]]
 
 if not game:IsLoaded() then game.Loaded:Wait() end
@@ -9,8 +9,9 @@ if not game:GetService("Players").LocalPlayer then
 end
 
 local HttpService = game:GetService("HttpService")
+local TweenService = game:GetService("TweenService")
 
--- ==== Persistent Config Load ====
+-- Config load/save
 local configFile = "JokiConfig.json"
 local defaultConfig = {
     activeTab = "Webhook",
@@ -22,7 +23,6 @@ local defaultConfig = {
         nama_store = ""
     }
 }
-
 local function loadConfig()
     local success, data = pcall(function()
         if isfile(configFile) then
@@ -31,33 +31,30 @@ local function loadConfig()
     end)
     return success and data or defaultConfig
 end
-
 local function saveConfig(data)
     pcall(function()
         writefile(configFile, HttpService:JSONEncode(data))
     end)
 end
-
 local state = loadConfig()
-saveConfig(state) -- Write back in case file didn't exist before
+saveConfig(state)
 
--- ==== UI Setup ====
+-- Clean up old UI
 pcall(function()
     game:GetService("CoreGui"):FindFirstChild("JokiWebhookUI_ScreenGui"):Destroy()
 end)
 
-local TweenService = game:GetService("TweenService")
-local CoreGui = game:GetService("CoreGui")
-
+-- UI Setup
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "JokiWebhookUI_ScreenGui"
 screenGui.ResetOnSpawn = false
 screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
-screenGui.Parent = CoreGui
+screenGui.Parent = game:GetService("CoreGui")
+
+local fullHeight, minimizedHeight = 380, 40
 
 local mainFrame = Instance.new("Frame")
-mainFrame.Name = "MainFrame"
-mainFrame.Size = UDim2.new(0, 400, 0, state.minimized and 40 or 380)
+mainFrame.Size = UDim2.new(0, 400, 0, state.minimized and minimizedHeight or fullHeight)
 mainFrame.Position = UDim2.new(0.5, -200, 0.5, -190)
 mainFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
 mainFrame.BorderColor3 = Color3.fromRGB(85, 85, 105)
@@ -86,7 +83,7 @@ titleLabel.TextSize = 16
 titleLabel.TextXAlignment = Enum.TextXAlignment.Left
 titleLabel.Parent = titleBar
 
--- Close + Minimize Buttons
+-- Close Button
 local closeButton = Instance.new("TextButton")
 closeButton.Size = UDim2.new(0, 24, 0, 24)
 closeButton.Position = UDim2.new(1, -6, 0, 3)
@@ -102,6 +99,7 @@ closeButton.MouseButton1Click:Connect(function()
     screenGui.Enabled = false
 end)
 
+-- Minimize Button
 local minimizeButton = Instance.new("TextButton")
 minimizeButton.Size = UDim2.new(0, 24, 0, 24)
 minimizeButton.Position = UDim2.new(1, -36, 0, 3)
@@ -114,27 +112,7 @@ minimizeButton.TextSize = 16
 minimizeButton.Parent = titleBar
 Instance.new("UICorner", minimizeButton).CornerRadius = UDim.new(0, 6)
 
-local fullHeight = 380
-local minimizedHeight = 40
-
-minimizeButton.MouseButton1Click:Connect(function()
-    state.minimized = not state.minimized
-    saveConfig(state)
-
-    -- Animate frame size
-    local targetSize = state.minimized and UDim2.new(0, 400, 0, minimizedHeight) or UDim2.new(0, 400, 0, fullHeight)
-    TweenService:Create(mainFrame, TweenInfo.new(0.25), {Size = targetSize}):Play()
-
-    -- Hide tab buttons
-    tabHolder.Visible = not state.minimized
-
-    -- Clean tab visibility toggle
-    webhookTab.Visible = not state.minimized and state.activeTab == "Webhook"
-    toolsTab.Visible = not state.minimized and state.activeTab == "Tools"
-end)
-
-
--- Tab Setup
+-- Tabs + Content Holders
 local tabHolder = Instance.new("Frame")
 tabHolder.Size = UDim2.new(1, 0, 0, 30)
 tabHolder.Position = UDim2.new(0, 0, 0, 30)
@@ -147,27 +125,24 @@ webhookTab.Position = UDim2.new(0, 0, 0, 60)
 webhookTab.BackgroundTransparency = 1
 webhookTab.Parent = mainFrame
 
+local webhookContent = Instance.new("Frame")
+webhookContent.Name = "ContentHolder"
+webhookContent.BackgroundTransparency = 1
+webhookContent.Size = UDim2.new(1, 0, 1, 0)
+webhookContent.Parent = webhookTab
+
 local toolsTab = webhookTab:Clone()
 toolsTab.Name = "ToolsTab"
 toolsTab.Parent = mainFrame
 
-local function animateTabSwitch(showTab, hideTab)
-    hideTab.Visible = true
-    showTab.Visible = true
-    TweenService:Create(hideTab, TweenInfo.new(0.25), {BackgroundTransparency = 1}):Play()
-    TweenService:Create(showTab, TweenInfo.new(0.25), {BackgroundTransparency = 0}):Play()
-    wait(0.25)
-    hideTab.Visible = false
-end
+local toolsContent = toolsTab:FindFirstChild("ContentHolder")
 
+-- Tab Switching
 local function showTab(name)
     state.activeTab = name
     saveConfig(state)
-    if name == "Webhook" then
-        animateTabSwitch(webhookTab, toolsTab)
-    else
-        animateTabSwitch(toolsTab, webhookTab)
-    end
+    webhookContent.Visible = name == "Webhook" and not state.minimized
+    toolsContent.Visible = name == "Tools" and not state.minimized
 end
 
 local function createTabButton(name, index)
@@ -189,29 +164,32 @@ end
 createTabButton("Webhook", 1)
 createTabButton("Tools", 2)
 
--- Load saved tab
-if state.activeTab == "Tools" then
-    toolsTab.Visible = true
-    webhookTab.Visible = false
-else
-    webhookTab.Visible = true
-    toolsTab.Visible = false
-end
+-- Minimize Fix (FINAL WORKING VERSION ✅)
+minimizeButton.MouseButton1Click:Connect(function()
+    state.minimized = not state.minimized
+    saveConfig(state)
 
--- Webhook Tab Inputs
-local listLayout = Instance.new("UIListLayout")
-listLayout.Padding = UDim.new(0, 8)
-listLayout.SortOrder = Enum.SortOrder.LayoutOrder
-listLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-listLayout.Parent = webhookTab
-Instance.new("UIPadding", webhookTab).PaddingTop = UDim.new(0, 5)
+    TweenService:Create(mainFrame, TweenInfo.new(0.25), {
+        Size = state.minimized and UDim2.new(0, 400, 0, minimizedHeight) or UDim2.new(0, 400, 0, fullHeight)
+    }):Play()
 
-local function createLabeledInput(labelText, placeholder, key, order)
+    tabHolder.Visible = not state.minimized
+    webhookContent.Visible = not state.minimized and state.activeTab == "Webhook"
+    toolsContent.Visible = not state.minimized and state.activeTab == "Tools"
+end)
+
+-- Initialize tab visibility
+tabHolder.Visible = not state.minimized
+webhookContent.Visible = not state.minimized and state.activeTab == "Webhook"
+toolsContent.Visible = not state.minimized and state.activeTab == "Tools"
+
+-- Webhook Content UI
+local function createInput(labelText, placeholder, key, order)
     local container = Instance.new("Frame")
     container.Size = UDim2.new(0.9, 0, 0, 50)
     container.BackgroundTransparency = 1
     container.LayoutOrder = order
-    container.Parent = webhookTab
+    container.Parent = webhookContent
 
     local label = Instance.new("TextLabel")
     label.Size = UDim2.new(1, 0, 0, 20)
@@ -246,12 +224,91 @@ local function createLabeledInput(labelText, placeholder, key, order)
     return textbox
 end
 
-local jamSelesaiBox = createLabeledInput("jam_selesai_joki", "e.g., 1", "jam_selesai_joki", 1)
-local webhookBox = createLabeledInput("discord_webhook", "Paste Discord Webhook", "discord_webhook", 2)
-local orderBox = createLabeledInput("no_order", "e.g., OD000000123", "no_order", 3)
-local storeNameBox = createLabeledInput("nama_store", "e.g., AfkarStore", "nama_store", 4)
+local listLayout = Instance.new("UIListLayout")
+listLayout.Padding = UDim.new(0, 8)
+listLayout.SortOrder = Enum.SortOrder.LayoutOrder
+listLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+listLayout.Parent = webhookContent
 
--- Run Infinite Yield in Tools Tab
+Instance.new("UIPadding", webhookContent).PaddingTop = UDim.new(0, 5)
+
+local jamSelesaiBox = createInput("jam_selesai_joki", "e.g., 1", "jam_selesai_joki", 1)
+local webhookBox = createInput("discord_webhook", "Paste Discord Webhook", "discord_webhook", 2)
+local orderBox = createInput("no_order", "e.g., OD000000123", "no_order", 3)
+local storeNameBox = createInput("nama_store", "e.g., AfkarStore", "nama_store", 4)
+
+-- Execute Button
+local executeButton = Instance.new("TextButton")
+executeButton.Size = UDim2.new(0.9, 0, 0, 40)
+executeButton.BackgroundColor3 = Color3.fromRGB(88, 101, 242)
+executeButton.BorderColor3 = Color3.fromRGB(120, 130, 255)
+executeButton.Text = "EXECUTE SCRIPT"
+executeButton.Font = Enum.Font.SourceSansBold
+executeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+executeButton.TextSize = 18
+executeButton.LayoutOrder = 5
+executeButton.Parent = webhookContent
+Instance.new("UICorner", executeButton).CornerRadius = UDim.new(0, 6)
+
+executeButton.MouseButton1Click:Connect(function()
+    local jamSelesai = tonumber(jamSelesaiBox.Text) or 1
+    local webhookUrl = webhookBox.Text
+    local orderId = orderBox.Text
+    local storeName = storeNameBox.Text
+
+    if webhookUrl == "" or orderId == "" or storeName == "" then
+        executeButton.Text = "PLEASE FILL ALL FIELDS"
+        executeButton.BackgroundColor3 = Color3.fromRGB(237, 66, 69)
+        task.wait(2)
+        executeButton.Text = "EXECUTE SCRIPT"
+        executeButton.BackgroundColor3 = Color3.fromRGB(88, 101, 242)
+        return
+    end
+
+    executeButton.Active = false
+    executeButton.Text = "EXECUTING..."
+    executeButton.BackgroundColor3 = Color3.fromRGB(80, 80, 90)
+
+    local success, content = pcall(function()
+        return game:HttpGet("https://raw.githubusercontent.com/afkar-gg/Roblox-Scripts/refs/heads/main/Webhook-Joki/Webhook.lua")
+    end)
+
+    if not success then
+        executeButton.Text = "HTTP GET FAILED"
+        executeButton.BackgroundColor3 = Color3.fromRGB(237, 66, 69)
+        warn("Failed to fetch script:", content)
+        task.wait(3)
+    else
+        local finalScript = string.format([[
+            local jam_selesai_joki = %s
+            local discord_webhook = %q
+            local no_order = %q
+            local nama_store = %q
+            %s
+        ]], jamSelesai, webhookUrl, orderId, storeName, content)
+
+        local ok, err = pcall(function()
+            loadstring(finalScript)()
+        end)
+
+        if ok then
+            executeButton.Text = "SUCCESS!"
+            executeButton.BackgroundColor3 = Color3.fromRGB(87, 242, 135)
+            task.wait(2)
+        else
+            executeButton.Text = "EXECUTION ERROR"
+            executeButton.BackgroundColor3 = Color3.fromRGB(237, 66, 69)
+            warn("Execution error:", err)
+            task.wait(3)
+        end
+    end
+
+    executeButton.Text = "EXECUTE SCRIPT"
+    executeButton.BackgroundColor3 = Color3.fromRGB(88, 101, 242)
+    executeButton.Active = true
+end)
+
+-- Tools Tab: Infinite Yield
 local iyButton = Instance.new("TextButton")
 iyButton.Size = UDim2.new(0, 200, 0, 40)
 iyButton.Position = UDim2.new(0.5, -100, 0.5, -20)
@@ -260,8 +317,9 @@ iyButton.Text = "Infinite Yield"
 iyButton.Font = Enum.Font.SourceSansBold
 iyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 iyButton.TextSize = 18
-iyButton.Parent = toolsTab
+iyButton.Parent = toolsContent
 Instance.new("UICorner", iyButton).CornerRadius = UDim.new(0, 6)
+
 iyButton.MouseButton1Click:Connect(function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()
 end)
