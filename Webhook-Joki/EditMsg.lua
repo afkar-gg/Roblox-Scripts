@@ -1,11 +1,11 @@
 local HttpService = game:GetService("HttpService")
 
-local webhook_url = "YOUR_WEBHOOK_URL" -- e.g., "https://discord.com/api/webhooks/xxxx/yyyy"
+local dc_webhook = "YOUR_WEBHOOK_URL" -- e.g., "https://discord.com/api/webhooks/xxxx/yyyy"
 local dc_message_id = "YOUR_MESSAGE_ID" -- your existing message ID
 local new_content = "This is the updated message!"
 
 -- Construct the edit endpoint
-local edit_url = string.format("%s/messages/%s", webhook_url, dc_message_id)
+local edit_url = string.format("%s/messages/%s", dc_webhook, dc_message_id)
 
 -- Data to send
 local data = {
