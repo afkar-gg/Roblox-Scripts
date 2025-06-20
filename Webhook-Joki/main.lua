@@ -77,15 +77,25 @@ closeButton.MouseButton1Click:Connect(function()
 end)
 
 -- Layout + Padding
+-- Create a new ContentFrame inside mainFrame
+local contentFrame = Instance.new("Frame")
+contentFrame.Name = "ContentFrame"
+contentFrame.Size = UDim2.new(1, 0, 1, -30) -- Leave space for title bar
+contentFrame.Position = UDim2.new(0, 0, 0, 30)
+contentFrame.BackgroundTransparency = 1
+contentFrame.Parent = mainFrame
+
+-- UIListLayout inside contentFrame
 local listLayout = Instance.new("UIListLayout")
 listLayout.Padding = UDim.new(0, 8)
 listLayout.SortOrder = Enum.SortOrder.LayoutOrder
 listLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-listLayout.Parent = mainFrame
+listLayout.Parent = contentFrame
 
+-- Padding for contentFrame
 local uiPadding = Instance.new("UIPadding")
-uiPadding.PaddingTop = UDim.new(0, 35)
-uiPadding.Parent = mainFrame
+uiPadding.PaddingTop = UDim.new(0, 10)
+uiPadding.Parent = contentFrame
 
 -- Input field helper
 local function createLabeledInput(name, placeholder, order, isNumber)
