@@ -1,23 +1,35 @@
 local HttpService = game:GetService("HttpService")
 local username = game.Players.LocalPlayer.Name
 
-local dc_webhook = "YOUR_WEBHOOK_URL" -- e.g., "https://discord.com/api/webhooks/xxxx/yyyy"
-local dc_message_id = "YOUR_MESSAGE_ID" -- your existing message ID
+-- Use _G values injected from the UI
+local dc_webhook = _G.dc_webhook
+local dc_message_id = _G.dc_message_id
 
 -- Construct the edit endpoint
 local edit_url = string.format("%s/messages/%s", dc_webhook, dc_message_id)
 
--- Data to send (now includes an embed)
+-- Create request function compatible with multiple executors
+local request = request or http_request or (syn and syn.request) or (HttpService.RequestAsync and function(opts)
+    return HttpService:RequestAsync(opts)
+end)
+
+if not request then
+    warn("Your executor does not support HTTP requests.")
+    return
+end
+
+-- Build embed message
 local data = {
     embeds = {{
         title = "Online Checked",
         description = " Username : " .. username .. "\nLast Checked : <t:" .. os.time() .. ":R>",
-        color = 16711680 -- red color (optional)
+        color = 16711680
     }}
 }
 
+-- Send the request
 local success, response = pcall(function()
-    return HttpService:RequestAsync({
+    return request({
         Url = edit_url,
         Method = "PATCH",
         Headers = {
@@ -27,8 +39,9 @@ local success, response = pcall(function()
     })
 end)
 
-if success and response.Success then
-    print("Message edited successfully!")
+-- Log result
+if success and response and response.Success then
+    print("✅ Discord message edited successfully!")
 else
-    warn("Failed to edit message: ", response and response.StatusCode, response and response.Body)
+    warn("❌ Failed to edit message:", response and response.StatusCode, response and response.Body)
 end
