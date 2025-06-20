@@ -17,15 +17,19 @@ local defaultConfig = {
     }
 }
 
-local function loadConfig()
-    if isfile(configFile) then
-        local success, result = pcall(function()
-            return HttpService:JSONDecode(readfile(configFile))
-        end)
-        if success then return result end
-    end
-    return defaultConfig
-end
+local defaultConfig = {
+    activeTab = "Webhook",
+    fields = {
+        jam_selesai_joki = "1",
+        discord_webhook = "",
+        no_order = "",
+        nama_store = ""
+    },
+    checker = {
+        dc_webhook = "",
+        dc_message_id = ""
+    }
+}
 
 local function saveConfig(config)
     writefile(configFile, HttpService:JSONEncode(config))
