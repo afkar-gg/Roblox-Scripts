@@ -227,11 +227,12 @@ executeBtn.MouseButton1Click:Connect(function()
     ]], jam_selesai_joki, discord_webhook, no_order, nama_store)
 
     local finalScript = string.format([[
-        %s
+    %s
 
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/afkar-gg/Roblox-Scripts/refs/heads/main/Webhook-Joki/main.lua"))();
+
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/afkar-gg/Roblox-Scripts/refs/heads/main/Webhook-Joki/Webhook.lua"))();
         loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))();
-    ]], injectedVars)
+]], injectedVars)
 
     local func, err = loadstring(finalScript)
     if not func then
