@@ -326,10 +326,13 @@ end)
 -- Tab Buttons
 local webhookBtn = createTabButton("Webhook", 1)
 local toolsBtn = createTabButton("Tools", 2)
+local checkerBtn = createTabButton("Checker", 3)
+checkerBtn.MouseButton1Click:Connect(function() switchTab("Checker") end)
 
 local function switchTab(tab)
     webhookTab.Visible = tab == "Webhook"
     toolsTab.Visible = tab == "Tools"
+    checkerTab.Visible = tab == "Checker"
     config.activeTab = tab
     saveConfig(config)
 end
