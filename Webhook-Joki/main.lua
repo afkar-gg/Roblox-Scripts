@@ -317,9 +317,18 @@ local tabButtons = {
 }
 
 local function switchTab(name)
-    webhookTab.Visible = name == "Webhook"
-    toolsTab.Visible = name == "Tools"
-    checkerTab.Visible = name == "Checker"
+    webhookTab.Visible = false
+    toolsTab.Visible = false
+    checkerTab.Visible = false
+
+    if name == "Webhook" then
+        webhookTab.Visible = true
+    elseif name == "Tools" then
+        toolsTab.Visible = true
+    elseif name == "Checker" then
+        checkerTab.Visible = true
+    end
+
     config.activeTab = name
     saveConfig(config)
 end
