@@ -1,58 +1,40 @@
 local HttpService = game:GetService("HttpService")
-local username = game.Players.LocalPlayer.Name
+local Players = game:GetService("Players")
 
--- Injected from UI
-local dc_webhook = _G.dc_webhook
-local dc_message_id = _G.dc_message_id
+-- Get the local player's username
+local username = Players.LocalPlayer and Players.LocalPlayer.Name or "Unknown"
 
--- Make sure they're not nil
-if not dc_webhook or not dc_message_id or dc_webhook == "" or dc_message_id == "" then
-    warn("Webhook URL or message ID not set.")
-    return
-end
+-- Build the message to send to the Discord bot
+local content = "Username: " .. username .. "\nLast Checked: <t:" .. os.time() .. ":R>"
 
-print("Using webhook:", dc_webhook)
-print("Editing message:", dc_message_id)
-
--- Build the edit URL
-local edit_url = string.format("%s/messages/%s", dc_webhook, dc_message_id)
-
--- Cross-executor request function
-local request = request or http_request or (syn and syn.request) or (HttpService.RequestAsync and function(opt)
-    return HttpService:RequestAsync(opt)
-end)
+-- Request compatibility (for Synapse X, KRNL, etc.)
+local request = request or http_request or (syn and syn.request) or
+                (HttpService.RequestAsync and function(opt)
+                    return HttpService:RequestAsync(opt)
+                end)
 
 if not request then
-    warn("HTTP requests are not supported on this executor.")
+    warn("❌ Your executor does not support HTTP requests.")
     return
 end
 
--- Loop every 5 minutes
-while true do
-    local embedData = {
-        embeds = {{
-            title = "Online Checked",
-            description = "Username: " .. username .. "\nLast Checked: <t:" .. os.time() .. ":R>",
-            color = 16711680
-        }}
-    }
-
-    local success, response = pcall(function()
-        return request({
-            Url = edit_url,
-            Method = "PATCH",
-            Headers = {
-                ["Content-Type"] = "application/json"
-            },
-            Body = HttpService:JSONEncode(embedData)
+-- Send the message to the Replit server (replace with your actual working URL)
+local success, res = pcall(function()
+    return request({
+        Url = "https://2bea6df1-6629-441f-81d4-d73bd1523fd3-00-3mudrqreqpixm.sisko.replit.dev/send",
+        Method = "POST",
+        Headers = {
+            ["Content-Type"] = "application/json"
+        },
+        Body = HttpService:JSONEncode({
+            content = content
         })
-    end)
+    })
+end)
 
-    if success and response and response.Success then
-        print("✅ Message edited successfully!")
-    else
-        warn("❌ Failed to edit message:", response and response.StatusCode, response and response.Body)
-    end
-
-    task.wait(300) -- Wait 5 minutes
+-- Handle result
+if success and res and res.Success then
+    print("✅ Message sent via bot!")
+else
+    warn("❌ Failed to send message:", res and res.StatusCode, res and res.Body)
 end
