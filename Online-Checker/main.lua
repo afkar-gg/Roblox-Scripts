@@ -1,19 +1,16 @@
--- Webhook Edit UI with Auto Save/Load and Script Execution
-
 if not game:IsLoaded() then game.Loaded:Wait() end
 if not game:GetService("Players").LocalPlayer then
-    warn("Client-only script.")
-    return
+	warn("Client-only script.")
+	return
 end
 
 -- ==== CONFIG ====
 local HttpService = game:GetService("HttpService")
-local configFile = "webhook_edit.json"
+local configFile = "proxy_config.json"
 local canUseFile = (readfile and writefile and isfile) and true or false
 
 local savedConfig = {
-	dc_webhook = "",
-	dc_message_id = ""
+	proxy_url = ""
 }
 
 if canUseFile and isfile(configFile) then
@@ -32,21 +29,20 @@ if canUseFile and isfile(configFile) then
 	end
 end
 
--- ==== UI ====
+-- ==== UI SETUP ====
 pcall(function()
-	game:GetService("CoreGui"):FindFirstChild("WebhookEditorUI"):Destroy()
+	game:GetService("CoreGui"):FindFirstChild("WebhookProxyUI"):Destroy()
 end)
 
 local gui = Instance.new("ScreenGui")
-gui.Name = "WebhookEditorUI"
+gui.Name = "WebhookProxyUI"
 gui.ResetOnSpawn = false
 gui.ZIndexBehavior = Enum.ZIndexBehavior.Global
 gui.Parent = game:GetService("CoreGui")
-gui.Enabled = true
 
 local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 400, 0, 250)
-frame.Position = UDim2.new(0.5, -200, 0.5, -125)
+frame.Size = UDim2.new(0, 400, 0, 180)
+frame.Position = UDim2.new(0.5, -200, 0.5, -90)
 frame.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
 frame.BorderColor3 = Color3.fromRGB(85, 85, 105)
 frame.BorderSizePixel = 2
@@ -55,7 +51,7 @@ frame.Draggable = true
 frame.Parent = gui
 Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 8)
 
--- ==== Title Bar ====
+-- ==== Title ====
 local titleBar = Instance.new("Frame")
 titleBar.Size = UDim2.new(1, 0, 0, 30)
 titleBar.BackgroundColor3 = Color3.fromRGB(45, 45, 55)
@@ -68,7 +64,7 @@ titleLabel.Size = UDim2.fromScale(1, 1)
 titleLabel.Position = UDim2.fromScale(0.5, 0.5)
 titleLabel.AnchorPoint = Vector2.new(0.5, 0.5)
 titleLabel.BackgroundTransparency = 1
-titleLabel.Text = "Edit Webhook Configuration"
+titleLabel.Text = "Bot Proxy Configuration"
 titleLabel.Font = Enum.Font.SourceSansBold
 titleLabel.TextColor3 = Color3.new(1, 1, 1)
 titleLabel.TextSize = 16
@@ -109,7 +105,7 @@ local padding = Instance.new("UIPadding")
 padding.PaddingTop = UDim.new(0, 10)
 padding.Parent = content
 
--- ==== Input Helper ====
+-- ==== Input Field ====
 local function makeInput(name, placeholder, order, defaultValue)
 	local container = Instance.new("Frame")
 	container.Size = UDim2.new(0.9, 0, 0, 50)
@@ -143,31 +139,26 @@ local function makeInput(name, placeholder, order, defaultValue)
 	box.Parent = container
 
 	Instance.new("UICorner", box).CornerRadius = UDim.new(0, 4)
-
 	return box
 end
 
--- Input Fields
-local webhookBox = makeInput("dc_webhook", "Paste webhook URL", 1, savedConfig.dc_webhook)
-local messageIdBox = makeInput("dc_message_id", "Enter message ID", 2, savedConfig.dc_message_id)
+local proxyBox = makeInput("proxy_url", "Paste your Replit proxy URL here", 1, savedConfig.proxy_url)
 
--- ==== Save Config ====
+-- ==== Auto Save ====
 local function saveConfig()
 	if not canUseFile then return end
 	local data = {
-		dc_webhook = webhookBox.Text,
-		dc_message_id = messageIdBox.Text
+		proxy_url = proxyBox.Text
 	}
-	local ok, json = pcall(function()
+	local success, json = pcall(function()
 		return HttpService:JSONEncode(data)
 	end)
-	if ok then
+	if success then
 		pcall(writefile, configFile, json)
 	end
 end
 
-webhookBox.FocusLost:Connect(saveConfig)
-messageIdBox.FocusLost:Connect(saveConfig)
+proxyBox.FocusLost:Connect(saveConfig)
 
 -- ==== Execute Button ====
 local executeBtn = Instance.new("TextButton")
@@ -179,13 +170,12 @@ executeBtn.Text = "EXECUTE SCRIPT"
 executeBtn.Font = Enum.Font.SourceSansBold
 executeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 executeBtn.TextSize = 18
-executeBtn.LayoutOrder = 3
+executeBtn.LayoutOrder = 2
 executeBtn.Parent = content
 Instance.new("UICorner", executeBtn).CornerRadius = UDim.new(0, 6)
 
+-- ==== On Execute ====
 executeBtn.MouseButton1Click:Connect(function()
-	_G.dc_webhook = webhookBox.Text
-	_G.dc_message_id = messageIdBox.Text
-
-	loadstring(game:HttpGet("https://raw.githubusercontent.com/afkar-gg/Roblox-Scripts/refs/heads/main/Online-Checker/Editmsg.lua"))();
+	_G.proxy_url = proxyBox.Text
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/afkar-gg/Roblox-Scripts/refs/heads/main/Online-Checker/SendToBot.lua"))();
 end)
