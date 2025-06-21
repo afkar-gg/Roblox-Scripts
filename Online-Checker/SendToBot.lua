@@ -42,6 +42,6 @@ end
 -- Send immediately, then repeat every 5 mins
 sendMessage()
 while true do
-	task.wait(300) -- 5 minutes
+	task.wait(180) -- 3 minutes
 	sendMessage()
 end
