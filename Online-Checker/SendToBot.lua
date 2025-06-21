@@ -20,7 +20,7 @@ if not request then
 end
 
 local function sendMessage()
-	local content = "Username: " .. username .. "\nLast Checked: <t:" .. os.time() .. ":R>"
+	local content = "Online 🟢\nUsername: " .. username .. "\nLast Checked: <t:" .. os.time() .. ":R>"
 	local success, res = pcall(function()
 		return request({
 			Url = proxy_url .. "/send",
