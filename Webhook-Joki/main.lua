@@ -33,7 +33,7 @@ if canUseFile and isfile(configFile) then
 	end
 end
 
--- ==== UI Setup ====
+-- Destroy old UI
 pcall(function()
 	game:GetService("CoreGui"):FindFirstChild("JokiWebhookUI"):Destroy()
 end)
@@ -47,25 +47,23 @@ local frame = Instance.new("Frame", gui)
 frame.Size = UDim2.new(0, 400, 0, 400)
 frame.Position = UDim2.new(0.5, -200, 0.5, -200)
 frame.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
-frame.BorderSizePixel = 2
 frame.BorderColor3 = Color3.fromRGB(85, 85, 105)
+frame.BorderSizePixel = 2
 frame.Active = true
 frame.Draggable = true
 Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 8)
 
--- Title bar
 local title = Instance.new("TextLabel", frame)
 title.Size = UDim2.new(1, 0, 0, 30)
 title.BackgroundColor3 = Color3.fromRGB(45, 45, 55)
 title.BorderColor3 = Color3.fromRGB(85, 85, 105)
 title.BorderSizePixel = 1
 title.Font = Enum.Font.SourceSansBold
-title.Text = "Joki Discord Bot Webhook Configuration"
+title.Text = "Joki Discord Bot Configuration"
 title.TextColor3 = Color3.new(1,1,1)
 title.TextSize = 16
 title.TextXAlignment = Enum.TextXAlignment.Center
 
--- Close button
 local closeBtn = Instance.new("TextButton", title)
 closeBtn.Size = UDim2.new(0, 24, 0, 24)
 closeBtn.Position = UDim2.new(1, -6, 0, 3)
@@ -122,14 +120,12 @@ local function makeInput(labelText, placeholder, order, default)
 	return box
 end
 
--- Fields
 local jamBox = makeInput("jam_selesai_joki", "e.g., 1", 1, savedConfig.jam_selesai_joki)
-local proxyBox = makeInput("proxy_url", "Paste your Cloudflare proxy URL", 2, savedConfig.proxy_url)
-local chanBox = makeInput("channel_id", "Target Discord Channel ID", 3, savedConfig.channel_id)
+local proxyBox = makeInput("proxy_url", "Cloudflare Proxy URL", 2, savedConfig.proxy_url)
+local chanBox = makeInput("channel_id", "Discord Channel ID", 3, savedConfig.channel_id)
 local orderBox = makeInput("no_order", "e.g., OD000000141234567", 4, savedConfig.no_order)
 local storeBox = makeInput("nama_store", "e.g., AfkarStore", 5, savedConfig.nama_store)
 
--- Save config
 local function saveConfig()
 	if not canUseFile then return end
 	local data = {
@@ -139,17 +135,16 @@ local function saveConfig()
 		no_order = orderBox.Text,
 		nama_store = storeBox.Text
 	}
-	local ok, result = pcall(function()
+	local ok, json = pcall(function()
 		return HttpService:JSONEncode(data)
 	end)
-	if ok then pcall(writefile, configFile, result) end
+	if ok then pcall(writefile, configFile, json) end
 end
 
 for _, box in ipairs({jamBox, proxyBox, chanBox, orderBox, storeBox}) do
 	box.FocusLost:Connect(saveConfig)
 end
 
--- Execute button
 local execBtn = Instance.new("TextButton", content)
 execBtn.Size = UDim2.new(0.9, 0, 0, 40)
 execBtn.BackgroundColor3 = Color3.fromRGB(88, 101, 242)
@@ -162,7 +157,6 @@ execBtn.TextSize = 18
 execBtn.LayoutOrder = 6
 Instance.new("UICorner", execBtn).CornerRadius = UDim.new(0, 6)
 
--- Main logic
 execBtn.MouseButton1Click:Connect(function()
 	local jam = tonumber(jamBox.Text)
 	local proxy = proxyBox.Text
@@ -186,23 +180,23 @@ execBtn.MouseButton1Click:Connect(function()
 			title = "JOKI STARTED",
 			description = "Username: " .. username,
 			color = 65280,
-			fields = {
-				{
-					name = "Info Joki",
-					value = "Nomor Order : " .. order .. "\nLink Pesanan : [Link Pesanan](https://tokoku.itemku.com/riwayat-pesanan/rincian/" .. string.sub(order, 9) .. ")"
-				},
-				{
-					name = "Time",
-					value = "Start: <t:" .. os.time() .. ":f>\nEnd: <t:" .. (os.time() + jam * 3600) .. ":f>"
-				}
-			},
+			fields = {{
+				name = "Info Joki",
+				value = "Nomor Order : " .. order .. "\nLink Pesanan : [Link Pesanan](https://tokoku.itemku.com/riwayat-pesanan/rincian/" .. string.sub(order, 9) .. ")"
+			}, {
+				name = "Time",
+				value = "Start: <t:" .. os.time() .. ":f>\nEnd: <t:" .. (os.time() + jam * 3600) .. ":f>"
+			}},
 			footer = { text = "- " .. store .. " ❤️" }
 		}}
 	}
 
-	local ok = pcall(function()
-		HttpService:PostAsync(proxy, HttpService:JSONEncode(embedPayload), Enum.HttpContentType.ApplicationJson)
+	local ok, result = pcall(function()
+		return HttpService:PostAsync(proxy, HttpService:JSONEncode(embedPayload), Enum.HttpContentType.ApplicationJson)
 	end)
+
+	print("[DEBUG] POST success:", ok)
+	print("[DEBUG] POST result:", result)
 
 	if ok then
 		execBtn.Text = "✅ SUCCESS"
@@ -216,7 +210,7 @@ execBtn.MouseButton1Click:Connect(function()
 	execBtn.Text = "EXECUTE SCRIPT"
 	execBtn.BackgroundColor3 = Color3.fromRGB(88, 101, 242)
 
-	-- 🌀 Status loop
+	-- Loop status every 3 mins
 	local start = tick()
 	task.spawn(function()
 		while tick() - start < jam * 3600 do
