@@ -162,38 +162,57 @@ executeBtn.MouseButton1Click:Connect(function()
 		return
 	end
 
-	-- POST to /send (embed)
-	local sendPayload = {
-		username = username,
-		jam_selesai_joki = jam,
-		no_order = order,
-		nama_store = store,
-		channel_id = channel
-	}
+	local HttpService = game:GetService("HttpService")
+
+	-- Send embed (/send)
 	pcall(function()
 		req({
 			Url = baseUrl .. "/send",
 			Method = "POST",
 			Headers = {["Content-Type"] = "application/json"},
-			Body = HttpService:JSONEncode(sendPayload)
+			Body = HttpService:JSONEncode({
+				username = username,
+				jam_selesai_joki = jam,
+				no_order = order,
+				nama_store = store,
+				channel_id = channel
+			})
 		})
 	end)
 
-	-- POST to /check (plain)
-	local checkPayload = {
-		username = username,
-		channel_id = channel
-	}
+	-- Send plain message (/check)
 	pcall(function()
 		req({
 			Url = baseUrl .. "/check",
 			Method = "POST",
 			Headers = {["Content-Type"] = "application/json"},
-			Body = HttpService:JSONEncode(checkPayload)
+			Body = HttpService:JSONEncode({
+				username = username,
+				channel_id = channel
+			})
 		})
 	end)
 
-	executeBtn.Text = "✅ SENT BOTH"
+	-- 🔁 Looping plain /check every 5 minutes
+	task.spawn(function()
+		while true do
+			pcall(function()
+				req({
+					Url = baseUrl .. "/check",
+					Method = "POST",
+					Headers = {["Content-Type"] = "application/json"},
+					Body = HttpService:JSONEncode({
+						username = username,
+						channel_id = channel
+					})
+				})
+				print("✅ /check heartbeat sent")
+			end)
+			task.wait(300)
+		end
+	end)
+
+	executeBtn.Text = "✅ SENT & LOOPING"
 	executeBtn.BackgroundColor3 = Color3.fromRGB(87, 242, 135)
 	task.wait(2)
 	executeBtn.Text = "EXECUTE SCRIPT"
