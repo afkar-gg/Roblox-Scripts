@@ -1,25 +1,30 @@
 if not game:IsLoaded() then game.Loaded:Wait() end
-local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local HttpService = game:GetService("HttpService")
-local player = Players.LocalPlayer
 
--- Config save/load
-local configFile = "joki_config.json"
+local HttpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+-- Config
+local configFile = "joki_proxy_config.json"
 local canSave = (writefile and readfile and isfile)
 
 local saved = {
 	jam_selesai_joki = "1",
 	no_order = "",
-	nama_store = ""
+	nama_store = "",
+	channel_id = "",
+	proxy_url = ""
 }
 
+-- Load Config
 if canSave and isfile(configFile) then
-	local ok, json = pcall(readfile, configFile)
+	local ok, content = pcall(readfile, configFile)
 	if ok then
-		local decode = pcall(function() return HttpService:JSONDecode(json) end)
-		if decode then
-			for k, v in pairs(decode) do
+		local success, data = pcall(function()
+			return HttpService:JSONDecode(content)
+		end)
+		if success and typeof(data) == "table" then
+			for k, v in pairs(data) do
 				if saved[k] ~= nil then
 					saved[k] = tostring(v)
 				end
@@ -28,14 +33,14 @@ if canSave and isfile(configFile) then
 	end
 end
 
--- UI setup
+-- UI Setup
 local gui = Instance.new("ScreenGui", game:GetService("CoreGui"))
 gui.Name = "JokiWebhookUI"
 gui.ResetOnSpawn = false
 
 local frame = Instance.new("Frame", gui)
-frame.Size = UDim2.new(0, 400, 0, 300)
-frame.Position = UDim2.new(0.5, -200, 0.5, -150)
+frame.Size = UDim2.new(0, 400, 0, 360)
+frame.Position = UDim2.new(0.5, -200, 0.5, -180)
 frame.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
 frame.Active = true
 frame.Draggable = true
@@ -43,7 +48,7 @@ Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 8)
 
 local title = Instance.new("TextLabel", frame)
 title.Size = UDim2.new(1, 0, 0, 30)
-title.Text = "Webhook Joki Configuration"
+title.Text = "Discord Bot Joki Configuration"
 title.BackgroundColor3 = Color3.fromRGB(45, 45, 55)
 title.TextColor3 = Color3.new(1, 1, 1)
 title.TextSize = 16
@@ -57,12 +62,10 @@ close.BackgroundColor3 = Color3.fromRGB(231, 76, 60)
 close.TextColor3 = Color3.new(1, 1, 1)
 close.TextSize = 14
 Instance.new("UICorner", close).CornerRadius = UDim.new(0, 6)
-
 close.MouseButton1Click:Connect(function()
 	gui.Enabled = false
 end)
 
--- Layout
 local content = Instance.new("Frame", frame)
 content.Position = UDim2.new(0, 0, 0, 30)
 content.Size = UDim2.new(1, 0, 1, -30)
@@ -101,26 +104,31 @@ local function makeInput(labelText, placeholder, default)
 	return box
 end
 
--- Input fields
 local jamBox = makeInput("jam_selesai_joki", "e.g., 1", saved.jam_selesai_joki)
 local orderBox = makeInput("no_order", "e.g., OD123456", saved.no_order)
 local storeBox = makeInput("nama_store", "e.g., AfkarStore", saved.nama_store)
+local chanBox = makeInput("channel_id", "Discord Channel ID", saved.channel_id)
+local urlBox = makeInput("proxy_url", "https://xxxx.trycloudflare.com/send", saved.proxy_url)
 
--- Auto-save
+-- Save config on change
 local function save()
 	if not canSave then return end
-	local data = {
+	local config = {
 		jam_selesai_joki = jamBox.Text,
 		no_order = orderBox.Text,
-		nama_store = storeBox.Text
+		nama_store = storeBox.Text,
+		channel_id = chanBox.Text,
+		proxy_url = urlBox.Text
 	}
-	local ok, encoded = pcall(function() return HttpService:JSONEncode(data) end)
-	if ok then pcall(writefile, configFile, encoded) end
+	local ok, json = pcall(function()
+		return HttpService:JSONEncode(config)
+	end)
+	if ok then pcall(writefile, configFile, json) end
 end
 
-jamBox.FocusLost:Connect(save)
-orderBox.FocusLost:Connect(save)
-storeBox.FocusLost:Connect(save)
+for _, box in ipairs({jamBox, orderBox, storeBox, chanBox, urlBox}) do
+	box.FocusLost:Connect(save)
+end
 
 -- Execute Button
 local exec = Instance.new("TextButton", content)
@@ -131,16 +139,17 @@ exec.TextColor3 = Color3.new(1, 1, 1)
 exec.TextSize = 18
 exec.Font = Enum.Font.SourceSansBold
 Instance.new("UICorner", exec).CornerRadius = UDim.new(0, 6)
+exec.Parent = content
 
 exec.MouseButton1Click:Connect(function()
-	local data = {
-		jam_selesai_joki = tonumber(jamBox.Text) or 1,
-		no_order = orderBox.Text,
-		nama_store = storeBox.Text,
-		username = player.Name
-	}
+	local jam = tonumber(jamBox.Text)
+	local order = orderBox.Text
+	local store = storeBox.Text
+	local channel = chanBox.Text
+	local url = urlBox.Text
+	local username = LocalPlayer.Name
 
-	if data.no_order == "" or data.nama_store == "" then
+	if not jam or order == "" or store == "" or channel == "" or url == "" then
 		exec.Text = "FILL ALL FIELDS"
 		exec.BackgroundColor3 = Color3.fromRGB(237, 66, 69)
 		task.wait(2)
@@ -149,9 +158,33 @@ exec.MouseButton1Click:Connect(function()
 		return
 	end
 
-	local remote = ReplicatedStorage:WaitForChild("SendWebhookData")
-	remote:FireServer(data)
+	-- Send POST request to proxy
+	local data = {
+		jam_selesai_joki = jam,
+		no_order = order,
+		nama_store = store,
+		channel_id = channel,
+		username = username
+	}
+
+	local encoded = HttpService:JSONEncode(data)
+	local req = (http_request or request or syn and syn.request)
+
+	if not req then
+		warn("❌ Executor does not support http requests.")
+		exec.Text = "HTTP ERROR"
+		exec.BackgroundColor3 = Color3.fromRGB(237, 66, 69)
+		return
+	end
+
+	local res = req({
+		Url = url,
+		Method = "POST",
+		Headers = { ["Content-Type"] = "application/json" },
+		Body = encoded
+	})
+
 	exec.Text = "SENT"
-	task.wait(1)
+	task.wait(2)
 	exec.Text = "EXECUTE SCRIPT"
 end)
