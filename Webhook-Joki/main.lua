@@ -6,22 +6,24 @@ local Players = game:GetService("Players")
 local username = Players.LocalPlayer.Name
 
 local configFile = "joki_config.json"
-local canUseFile = (readfile and writefile and isfile) and true or false
+local canUseFile = (readfile and writefile and isfile)
 
 local savedConfig = {
 	jam_selesai_joki = "1",
 	proxy_url = "",
+	channel_id = "",
 	no_order = "",
 	nama_store = ""
 }
 
+-- Load config
 if canUseFile and isfile(configFile) then
-	local success, content = pcall(readfile, configFile)
-	if success then
-		local ok, decoded = pcall(function()
+	local ok, content = pcall(readfile, configFile)
+	if ok then
+		local success, decoded = pcall(function()
 			return HttpService:JSONDecode(content)
 		end)
-		if ok and typeof(decoded) == "table" then
+		if success and typeof(decoded) == "table" then
 			for k, v in pairs(decoded) do
 				if savedConfig[k] ~= nil then
 					savedConfig[k] = tostring(v)
@@ -31,70 +33,63 @@ if canUseFile and isfile(configFile) then
 	end
 end
 
+-- ==== UI Setup ====
 pcall(function()
-	game:GetService("CoreGui"):FindFirstChild("JokiWebhookUI_ScreenGui"):Destroy()
+	game:GetService("CoreGui"):FindFirstChild("JokiWebhookUI"):Destroy()
 end)
 
 local gui = Instance.new("ScreenGui", game:GetService("CoreGui"))
-gui.Name = "JokiWebhookUI_ScreenGui"
-gui.ResetOnSpawn = false
+gui.Name = "JokiWebhookUI"
 gui.ZIndexBehavior = Enum.ZIndexBehavior.Global
+gui.ResetOnSpawn = false
 
 local frame = Instance.new("Frame", gui)
-frame.Size = UDim2.new(0, 400, 0, 380)
-frame.Position = UDim2.new(0.5, -200, 0.5, -190)
+frame.Size = UDim2.new(0, 400, 0, 400)
+frame.Position = UDim2.new(0.5, -200, 0.5, -200)
 frame.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
-frame.BorderColor3 = Color3.fromRGB(85, 85, 105)
 frame.BorderSizePixel = 2
+frame.BorderColor3 = Color3.fromRGB(85, 85, 105)
 frame.Active = true
 frame.Draggable = true
 Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 8)
 
-local titleBar = Instance.new("Frame", frame)
-titleBar.Size = UDim2.new(1, 0, 0, 30)
-titleBar.BackgroundColor3 = Color3.fromRGB(45, 45, 55)
-titleBar.BorderColor3 = Color3.fromRGB(85, 85, 105)
-titleBar.BorderSizePixel = 1
+-- Title bar
+local title = Instance.new("TextLabel", frame)
+title.Size = UDim2.new(1, 0, 0, 30)
+title.BackgroundColor3 = Color3.fromRGB(45, 45, 55)
+title.BorderColor3 = Color3.fromRGB(85, 85, 105)
+title.BorderSizePixel = 1
+title.Font = Enum.Font.SourceSansBold
+title.Text = "Joki Discord Bot Webhook Configuration"
+title.TextColor3 = Color3.new(1,1,1)
+title.TextSize = 16
+title.TextXAlignment = Enum.TextXAlignment.Center
 
-local titleLabel = Instance.new("TextLabel", titleBar)
-titleLabel.Size = UDim2.fromScale(1, 1)
-titleLabel.Position = UDim2.fromScale(0.5, 0.5)
-titleLabel.AnchorPoint = Vector2.new(0.5, 0.5)
-titleLabel.BackgroundTransparency = 1
-titleLabel.Text = "Webhook Joki Configuration"
-titleLabel.Font = Enum.Font.SourceSansBold
-titleLabel.TextColor3 = Color3.new(1, 1, 1)
-titleLabel.TextSize = 16
-titleLabel.TextXAlignment = Enum.TextXAlignment.Center
-
-local closeButton = Instance.new("TextButton", titleBar)
-closeButton.Size = UDim2.new(0, 24, 0, 24)
-closeButton.Position = UDim2.new(1, -6, 0, 3)
-closeButton.AnchorPoint = Vector2.new(1, 0)
-closeButton.BackgroundColor3 = Color3.fromRGB(231, 76, 60)
-closeButton.Text = "X"
-closeButton.Font = Enum.Font.SourceSansBold
-closeButton.TextColor3 = Color3.new(1, 1, 1)
-closeButton.TextSize = 14
-Instance.new("UICorner", closeButton).CornerRadius = UDim.new(0, 6)
-
-closeButton.MouseButton1Click:Connect(function()
+-- Close button
+local closeBtn = Instance.new("TextButton", title)
+closeBtn.Size = UDim2.new(0, 24, 0, 24)
+closeBtn.Position = UDim2.new(1, -6, 0, 3)
+closeBtn.AnchorPoint = Vector2.new(1, 0)
+closeBtn.Text = "X"
+closeBtn.Font = Enum.Font.SourceSansBold
+closeBtn.TextSize = 14
+closeBtn.TextColor3 = Color3.new(1,1,1)
+closeBtn.BackgroundColor3 = Color3.fromRGB(231, 76, 60)
+Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(0, 6)
+closeBtn.MouseButton1Click:Connect(function()
 	gui.Enabled = false
 end)
 
 local content = Instance.new("Frame", frame)
-content.Size = UDim2.new(1, 0, 1, -30)
 content.Position = UDim2.new(0, 0, 0, 30)
+content.Size = UDim2.new(1, 0, 1, -30)
 content.BackgroundTransparency = 1
 
 local layout = Instance.new("UIListLayout", content)
 layout.Padding = UDim.new(0, 8)
-layout.SortOrder = Enum.SortOrder.LayoutOrder
 layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 
-Instance.new("UIPadding", content).PaddingTop = UDim.new(0, 10)
-
-local function makeInput(name, placeholder, order, defaultValue)
+local function makeInput(labelText, placeholder, order, default)
 	local container = Instance.new("Frame", content)
 	container.Size = UDim2.new(0.9, 0, 0, 50)
 	container.BackgroundTransparency = 1
@@ -102,24 +97,24 @@ local function makeInput(name, placeholder, order, defaultValue)
 
 	local label = Instance.new("TextLabel", container)
 	label.Size = UDim2.new(1, 0, 0, 20)
-	label.BackgroundTransparency = 1
-	label.Text = name
-	label.Font = Enum.Font.SourceSans
+	label.Text = labelText
 	label.TextColor3 = Color3.fromRGB(220, 220, 220)
-	label.TextSize = 14
 	label.TextXAlignment = Enum.TextXAlignment.Left
+	label.BackgroundTransparency = 1
+	label.Font = Enum.Font.SourceSans
+	label.TextSize = 14
 
 	local box = Instance.new("TextBox", container)
 	box.Size = UDim2.new(1, 0, 0, 30)
 	box.Position = UDim2.new(0, 0, 0, 20)
+	box.PlaceholderText = placeholder
+	box.Text = default or ""
+	box.Font = Enum.Font.SourceSans
+	box.TextColor3 = Color3.new(1,1,1)
+	box.TextSize = 14
 	box.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
 	box.BorderColor3 = Color3.fromRGB(85, 85, 105)
 	box.BorderSizePixel = 1
-	box.Font = Enum.Font.SourceSans
-	box.PlaceholderText = placeholder
-	box.Text = defaultValue or ""
-	box.TextColor3 = Color3.new(1, 1, 1)
-	box.TextSize = 14
 	box.TextWrapped = true
 	box.ClearTextOnFocus = false
 	Instance.new("UICorner", box).CornerRadius = UDim.new(0, 4)
@@ -127,59 +122,65 @@ local function makeInput(name, placeholder, order, defaultValue)
 	return box
 end
 
-local jamSelesaiBox = makeInput("jam_selesai_joki", "e.g., 1", 1, savedConfig.jam_selesai_joki)
-local proxyBox = makeInput("proxy_url", "Paste your Proxy URL", 2, savedConfig.proxy_url)
-local orderBox = makeInput("no_order", "e.g., OD123456789", 3, savedConfig.no_order)
-local storeBox = makeInput("nama_store", "e.g., AfkarStore", 4, savedConfig.nama_store)
+-- Fields
+local jamBox = makeInput("jam_selesai_joki", "e.g., 1", 1, savedConfig.jam_selesai_joki)
+local proxyBox = makeInput("proxy_url", "Paste your Cloudflare proxy URL", 2, savedConfig.proxy_url)
+local chanBox = makeInput("channel_id", "Target Discord Channel ID", 3, savedConfig.channel_id)
+local orderBox = makeInput("no_order", "e.g., OD000000141234567", 4, savedConfig.no_order)
+local storeBox = makeInput("nama_store", "e.g., AfkarStore", 5, savedConfig.nama_store)
 
+-- Save config
 local function saveConfig()
 	if not canUseFile then return end
 	local data = {
-		jam_selesai_joki = jamSelesaiBox.Text,
+		jam_selesai_joki = jamBox.Text,
 		proxy_url = proxyBox.Text,
+		channel_id = chanBox.Text,
 		no_order = orderBox.Text,
 		nama_store = storeBox.Text
 	}
-	local ok, json = pcall(function()
+	local ok, result = pcall(function()
 		return HttpService:JSONEncode(data)
 	end)
-	if ok then pcall(writefile, configFile, json) end
+	if ok then pcall(writefile, configFile, result) end
 end
 
-jamSelesaiBox.FocusLost:Connect(saveConfig)
-proxyBox.FocusLost:Connect(saveConfig)
-orderBox.FocusLost:Connect(saveConfig)
-storeBox.FocusLost:Connect(saveConfig)
+for _, box in ipairs({jamBox, proxyBox, chanBox, orderBox, storeBox}) do
+	box.FocusLost:Connect(saveConfig)
+end
 
-local executeBtn = Instance.new("TextButton", content)
-executeBtn.Size = UDim2.new(0.9, 0, 0, 40)
-executeBtn.BackgroundColor3 = Color3.fromRGB(88, 101, 242)
-executeBtn.BorderColor3 = Color3.fromRGB(120, 130, 255)
-executeBtn.BorderSizePixel = 1
-executeBtn.Text = "EXECUTE SCRIPT"
-executeBtn.Font = Enum.Font.SourceSansBold
-executeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-executeBtn.TextSize = 18
-executeBtn.LayoutOrder = 5
-Instance.new("UICorner", executeBtn).CornerRadius = UDim.new(0, 6)
+-- Execute button
+local execBtn = Instance.new("TextButton", content)
+execBtn.Size = UDim2.new(0.9, 0, 0, 40)
+execBtn.BackgroundColor3 = Color3.fromRGB(88, 101, 242)
+execBtn.BorderColor3 = Color3.fromRGB(120, 130, 255)
+execBtn.BorderSizePixel = 1
+execBtn.Text = "EXECUTE SCRIPT"
+execBtn.Font = Enum.Font.SourceSansBold
+execBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+execBtn.TextSize = 18
+execBtn.LayoutOrder = 6
+Instance.new("UICorner", execBtn).CornerRadius = UDim.new(0, 6)
 
-executeBtn.MouseButton1Click:Connect(function()
-	local jam = tonumber(jamSelesaiBox.Text)
-	local proxy_url = proxyBox.Text
-	local no_order = orderBox.Text
-	local nama_store = storeBox.Text
+-- Main logic
+execBtn.MouseButton1Click:Connect(function()
+	local jam = tonumber(jamBox.Text)
+	local proxy = proxyBox.Text
+	local channel = chanBox.Text
+	local order = orderBox.Text
+	local store = storeBox.Text
 
-	if not jam or not proxy_url or proxy_url == "" or no_order == "" or nama_store == "" then
-		executeBtn.Text = "FILL ALL FIELDS"
-		executeBtn.BackgroundColor3 = Color3.fromRGB(237, 66, 69)
+	if not jam or proxy == "" or order == "" or store == "" or channel == "" then
+		execBtn.Text = "FILL ALL FIELDS"
+		execBtn.BackgroundColor3 = Color3.fromRGB(237, 66, 69)
 		wait(2)
-		executeBtn.Text = "EXECUTE SCRIPT"
-		executeBtn.BackgroundColor3 = Color3.fromRGB(88, 101, 242)
+		execBtn.Text = "EXECUTE SCRIPT"
+		execBtn.BackgroundColor3 = Color3.fromRGB(88, 101, 242)
 		return
 	end
 
-	-- ✅ EMBED MESSAGE
 	local embedPayload = {
+		channel_id = channel,
 		username = username,
 		embeds = {{
 			title = "JOKI STARTED",
@@ -188,55 +189,55 @@ executeBtn.MouseButton1Click:Connect(function()
 			fields = {
 				{
 					name = "Info Joki",
-					value = "Nomor Order : " .. no_order .. "\nLink Pesanan : [Link Pesanan](https://tokoku.itemku.com/riwayat-pesanan/rincian/" .. string.sub(no_order, 9) .. ")"
+					value = "Nomor Order : " .. order .. "\nLink Pesanan : [Link Pesanan](https://tokoku.itemku.com/riwayat-pesanan/rincian/" .. string.sub(order, 9) .. ")"
 				},
 				{
 					name = "Time",
 					value = "Start: <t:" .. os.time() .. ":f>\nEnd: <t:" .. (os.time() + jam * 3600) .. ":f>"
 				}
 			},
-			footer = { text = "- " .. nama_store .. " ❤️" }
+			footer = { text = "- " .. store .. " ❤️" }
 		}}
 	}
 
-	local success = pcall(function()
-		HttpService:PostAsync(proxy_url, HttpService:JSONEncode(embedPayload), Enum.HttpContentType.ApplicationJson)
+	local ok = pcall(function()
+		HttpService:PostAsync(proxy, HttpService:JSONEncode(embedPayload), Enum.HttpContentType.ApplicationJson)
 	end)
 
-	if success then
-		executeBtn.Text = "✅ SUCCESS!"
-		executeBtn.BackgroundColor3 = Color3.fromRGB(87, 242, 135)
+	if ok then
+		execBtn.Text = "✅ SUCCESS"
+		execBtn.BackgroundColor3 = Color3.fromRGB(87, 242, 135)
 	else
-		executeBtn.Text = "FAILED TO SEND"
-		executeBtn.BackgroundColor3 = Color3.fromRGB(237, 66, 69)
-		wait(3)
+		execBtn.Text = "❌ FAILED"
+		execBtn.BackgroundColor3 = Color3.fromRGB(237, 66, 69)
 	end
 
 	wait(2)
-	executeBtn.Text = "EXECUTE SCRIPT"
-	executeBtn.BackgroundColor3 = Color3.fromRGB(88, 101, 242)
+	execBtn.Text = "EXECUTE SCRIPT"
+	execBtn.BackgroundColor3 = Color3.fromRGB(88, 101, 242)
 
-	-- 🔁 LOOP
+	-- 🌀 Status loop
 	local start = tick()
 	task.spawn(function()
 		while tick() - start < jam * 3600 do
 			local msg = {
+				channel_id = channel,
 				username = username,
 				content = "✅ Username: " .. username .. "\nLast Checked: <t:" .. os.time() .. ":R>"
 			}
 			pcall(function()
-				HttpService:PostAsync(proxy_url, HttpService:JSONEncode(msg), Enum.HttpContentType.ApplicationJson)
+				HttpService:PostAsync(proxy, HttpService:JSONEncode(msg), Enum.HttpContentType.ApplicationJson)
 			end)
 			task.wait(180)
 		end
 
-		-- ✅ FINISH
-		local done = {
+		local final = {
+			channel_id = channel,
 			username = username,
-			content = "@everyone ✅ Joki finished for **" .. username .. "**!"
+			content = "@everyone ✅ Joki selesai untuk **" .. username .. "**!"
 		}
 		pcall(function()
-			HttpService:PostAsync(proxy_url, HttpService:JSONEncode(done), Enum.HttpContentType.ApplicationJson)
+			HttpService:PostAsync(proxy, HttpService:JSONEncode(final), Enum.HttpContentType.ApplicationJson)
 		end)
 	end)
 end)
