@@ -12,7 +12,6 @@ local saved = {
 	jam_selesai_joki = "1",
 	no_order = "",
 	nama_store = "",
-	channel_id = "",
 	proxy_url = ""
 }
 
@@ -106,7 +105,6 @@ end
 local jamBox = makeInput("jam_selesai_joki", "e.g., 1", saved.jam_selesai_joki)
 local orderBox = makeInput("no_order", "e.g., OD123456", saved.no_order)
 local storeBox = makeInput("nama_store", "e.g., AfkarStore", saved.nama_store)
-local chanBox = makeInput("channel_id", "Discord Channel ID", saved.channel_id)
 local urlBox = makeInput("proxy_url", "https://yourproxy.trycloudflare.com", saved.proxy_url)
 
 local function save()
@@ -115,7 +113,6 @@ local function save()
 		jam_selesai_joki = jamBox.Text,
 		no_order = orderBox.Text,
 		nama_store = storeBox.Text,
-		channel_id = chanBox.Text,
 		proxy_url = urlBox.Text
 	}
 	local ok, json = pcall(function()
@@ -124,7 +121,7 @@ local function save()
 	if ok then pcall(writefile, configFile, json) end
 end
 
-for _, box in ipairs({jamBox, orderBox, storeBox, chanBox, urlBox}) do
+for _, box in ipairs({jamBox, orderBox, storeBox, urlBox}) do
 	box.FocusLost:Connect(save)
 end
 
@@ -142,11 +139,10 @@ executeBtn.MouseButton1Click:Connect(function()
 	local jam = tonumber(jamBox.Text)
 	local order = orderBox.Text
 	local store = storeBox.Text
-	local channel = chanBox.Text
 	local baseUrl = urlBox.Text
 	local username = LocalPlayer.Name
 
-	if not jam or order == "" or store == "" or channel == "" or baseUrl == "" then
+	if not jam or order == "" or store == "" or baseUrl == "" then
 		executeBtn.Text = "FILL ALL FIELDS"
 		executeBtn.BackgroundColor3 = Color3.fromRGB(237, 66, 69)
 		task.wait(2)
@@ -171,8 +167,7 @@ executeBtn.MouseButton1Click:Connect(function()
 				username = username,
 				jam_selesai_joki = jam,
 				no_order = order,
-				nama_store = store,
-				channel_id = channel
+				nama_store = store
 			})
 		})
 	end)
@@ -184,8 +179,7 @@ executeBtn.MouseButton1Click:Connect(function()
 			Method = "POST",
 			Headers = {["Content-Type"] = "application/json"},
 			Body = HttpService:JSONEncode({
-				username = username,
-				channel_id = channel
+				username = username
 			})
 		})
 	end)
@@ -199,8 +193,7 @@ executeBtn.MouseButton1Click:Connect(function()
 					Method = "POST",
 					Headers = {["Content-Type"] = "application/json"},
 					Body = HttpService:JSONEncode({
-						username = username,
-						channel_id = channel
+						username = username
 					})
 				})
 			end)
@@ -219,8 +212,7 @@ executeBtn.MouseButton1Click:Connect(function()
 				Body = HttpService:JSONEncode({
 					username = username,
 					no_order = order,
-					nama_store = store,
-					channel_id = channel
+					nama_store = store
 				})
 			})
 			print("✅ Sent JOKI COMPLETED")
