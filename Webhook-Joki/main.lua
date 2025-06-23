@@ -1,74 +1,62 @@
--- All-in-One UI with Config Save/Load + Webhook Execution
-
 if not game:IsLoaded() then game.Loaded:Wait() end
-if not game:GetService("Players").LocalPlayer then
-    warn("Client-only script.")
-    return
-end
+if not game:GetService("Players").LocalPlayer then return end
 
--- ==== CONFIG SETUP ====
 local HttpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
+local username = Players.LocalPlayer.Name
+
 local configFile = "joki_config.json"
 local canUseFile = (readfile and writefile and isfile) and true or false
 
 local savedConfig = {
-    jam_selesai_joki = "1",
-    discord_webhook = "",
-    no_order = "",
-    nama_store = ""
+	jam_selesai_joki = "1",
+	proxy_url = "",
+	no_order = "",
+	nama_store = ""
 }
 
--- Load config if file exists
 if canUseFile and isfile(configFile) then
-    local success, content = pcall(readfile, configFile)
-    if success then
-        local ok, decoded = pcall(function()
-            return HttpService:JSONDecode(content)
-        end)
-        if ok and typeof(decoded) == "table" then
-            for k, v in pairs(decoded) do
-                if savedConfig[k] ~= nil then
-                    savedConfig[k] = tostring(v)
-                end
-            end
-        end
-    end
+	local success, content = pcall(readfile, configFile)
+	if success then
+		local ok, decoded = pcall(function()
+			return HttpService:JSONDecode(content)
+		end)
+		if ok and typeof(decoded) == "table" then
+			for k, v in pairs(decoded) do
+				if savedConfig[k] ~= nil then
+					savedConfig[k] = tostring(v)
+				end
+			end
+		end
+	end
 end
 
--- ==== UI SETUP ====
 pcall(function()
-    game:GetService("CoreGui"):FindFirstChild("JokiWebhookUI_ScreenGui"):Destroy()
+	game:GetService("CoreGui"):FindFirstChild("JokiWebhookUI_ScreenGui"):Destroy()
 end)
 
-local gui = Instance.new("ScreenGui")
+local gui = Instance.new("ScreenGui", game:GetService("CoreGui"))
 gui.Name = "JokiWebhookUI_ScreenGui"
 gui.ResetOnSpawn = false
 gui.ZIndexBehavior = Enum.ZIndexBehavior.Global
-gui.Parent = game:GetService("CoreGui")
 
-local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 400, 0, 350)
-frame.Position = UDim2.new(0.5, -200, 0.5, -175)
+local frame = Instance.new("Frame", gui)
+frame.Size = UDim2.new(0, 400, 0, 380)
+frame.Position = UDim2.new(0.5, -200, 0.5, -190)
 frame.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
 frame.BorderColor3 = Color3.fromRGB(85, 85, 105)
 frame.BorderSizePixel = 2
 frame.Active = true
 frame.Draggable = true
-frame.Parent = gui
+Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 8)
 
-local frameCorner = Instance.new("UICorner")
-frameCorner.CornerRadius = UDim.new(0, 8)
-frameCorner.Parent = frame
-
--- Title Bar
-local titleBar = Instance.new("Frame")
+local titleBar = Instance.new("Frame", frame)
 titleBar.Size = UDim2.new(1, 0, 0, 30)
 titleBar.BackgroundColor3 = Color3.fromRGB(45, 45, 55)
 titleBar.BorderColor3 = Color3.fromRGB(85, 85, 105)
 titleBar.BorderSizePixel = 1
-titleBar.Parent = frame
 
-local titleLabel = Instance.new("TextLabel")
+local titleLabel = Instance.new("TextLabel", titleBar)
 titleLabel.Size = UDim2.fromScale(1, 1)
 titleLabel.Position = UDim2.fromScale(0.5, 0.5)
 titleLabel.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -78,10 +66,8 @@ titleLabel.Font = Enum.Font.SourceSansBold
 titleLabel.TextColor3 = Color3.new(1, 1, 1)
 titleLabel.TextSize = 16
 titleLabel.TextXAlignment = Enum.TextXAlignment.Center
-titleLabel.TextYAlignment = Enum.TextYAlignment.Center
-titleLabel.Parent = titleBar
 
-local closeButton = Instance.new("TextButton")
+local closeButton = Instance.new("TextButton", titleBar)
 closeButton.Size = UDim2.new(0, 24, 0, 24)
 closeButton.Position = UDim2.new(1, -6, 0, 3)
 closeButton.AnchorPoint = Vector2.new(1, 0)
@@ -90,104 +76,82 @@ closeButton.Text = "X"
 closeButton.Font = Enum.Font.SourceSansBold
 closeButton.TextColor3 = Color3.new(1, 1, 1)
 closeButton.TextSize = 14
-closeButton.Parent = titleBar
-
-local closeCorner = Instance.new("UICorner")
-closeCorner.CornerRadius = UDim.new(0, 6)
-closeCorner.Parent = closeButton
+Instance.new("UICorner", closeButton).CornerRadius = UDim.new(0, 6)
 
 closeButton.MouseButton1Click:Connect(function()
-    gui.Enabled = false
+	gui.Enabled = false
 end)
 
--- Content Frame
-local content = Instance.new("Frame")
+local content = Instance.new("Frame", frame)
 content.Size = UDim2.new(1, 0, 1, -30)
 content.Position = UDim2.new(0, 0, 0, 30)
 content.BackgroundTransparency = 1
-content.Parent = frame
 
-local layout = Instance.new("UIListLayout")
+local layout = Instance.new("UIListLayout", content)
 layout.Padding = UDim.new(0, 8)
 layout.SortOrder = Enum.SortOrder.LayoutOrder
 layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-layout.Parent = content
 
-local padding = Instance.new("UIPadding")
-padding.PaddingTop = UDim.new(0, 10)
-padding.Parent = content
+Instance.new("UIPadding", content).PaddingTop = UDim.new(0, 10)
 
--- Input Helper
 local function makeInput(name, placeholder, order, defaultValue)
-    local container = Instance.new("Frame")
-    container.Size = UDim2.new(0.9, 0, 0, 50)
-    container.BackgroundTransparency = 1
-    container.LayoutOrder = order
-    container.Parent = content
+	local container = Instance.new("Frame", content)
+	container.Size = UDim2.new(0.9, 0, 0, 50)
+	container.BackgroundTransparency = 1
+	container.LayoutOrder = order
 
-    local label = Instance.new("TextLabel")
-    label.Size = UDim2.new(1, 0, 0, 20)
-    label.BackgroundTransparency = 1
-    label.Text = name
-    label.Font = Enum.Font.SourceSans
-    label.TextColor3 = Color3.fromRGB(220, 220, 220)
-    label.TextSize = 14
-    label.TextXAlignment = Enum.TextXAlignment.Left
-    label.Parent = container
+	local label = Instance.new("TextLabel", container)
+	label.Size = UDim2.new(1, 0, 0, 20)
+	label.BackgroundTransparency = 1
+	label.Text = name
+	label.Font = Enum.Font.SourceSans
+	label.TextColor3 = Color3.fromRGB(220, 220, 220)
+	label.TextSize = 14
+	label.TextXAlignment = Enum.TextXAlignment.Left
 
-    local box = Instance.new("TextBox")
-    box.Size = UDim2.new(1, 0, 0, 30)
-    box.Position = UDim2.new(0, 0, 0, 20)
-    box.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
-    box.BorderColor3 = Color3.fromRGB(85, 85, 105)
-    box.BorderSizePixel = 1
-    box.Font = Enum.Font.SourceSans
-    box.PlaceholderText = placeholder
-    box.Text = defaultValue or ""
-    box.TextColor3 = Color3.new(1, 1, 1)
-    box.TextSize = 14
-    box.TextWrapped = true
-    box.ClearTextOnFocus = false
-    box.Parent = container
+	local box = Instance.new("TextBox", container)
+	box.Size = UDim2.new(1, 0, 0, 30)
+	box.Position = UDim2.new(0, 0, 0, 20)
+	box.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+	box.BorderColor3 = Color3.fromRGB(85, 85, 105)
+	box.BorderSizePixel = 1
+	box.Font = Enum.Font.SourceSans
+	box.PlaceholderText = placeholder
+	box.Text = defaultValue or ""
+	box.TextColor3 = Color3.new(1, 1, 1)
+	box.TextSize = 14
+	box.TextWrapped = true
+	box.ClearTextOnFocus = false
+	Instance.new("UICorner", box).CornerRadius = UDim.new(0, 4)
 
-    local round = Instance.new("UICorner")
-    round.CornerRadius = UDim.new(0, 4)
-    round.Parent = box
-
-    return box
+	return box
 end
 
--- Input Boxes
 local jamSelesaiBox = makeInput("jam_selesai_joki", "e.g., 1", 1, savedConfig.jam_selesai_joki)
-local webhookBox = makeInput("discord_webhook", "Paste your Discord Webhook", 2, savedConfig.discord_webhook)
-local orderBox = makeInput("no_order", "e.g., OD0000000001", 3, savedConfig.no_order)
+local proxyBox = makeInput("proxy_url", "Paste your Proxy URL", 2, savedConfig.proxy_url)
+local orderBox = makeInput("no_order", "e.g., OD123456789", 3, savedConfig.no_order)
 local storeBox = makeInput("nama_store", "e.g., AfkarStore", 4, savedConfig.nama_store)
 
--- Save Function
 local function saveConfig()
-    if not canUseFile then return end
-    local data = {
-        jam_selesai_joki = jamSelesaiBox.Text,
-        discord_webhook = webhookBox.Text,
-        no_order = orderBox.Text,
-        nama_store = storeBox.Text
-    }
-    local success, json = pcall(function()
-        return HttpService:JSONEncode(data)
-    end)
-    if success then
-        pcall(writefile, configFile, json)
-    end
+	if not canUseFile then return end
+	local data = {
+		jam_selesai_joki = jamSelesaiBox.Text,
+		proxy_url = proxyBox.Text,
+		no_order = orderBox.Text,
+		nama_store = storeBox.Text
+	}
+	local ok, json = pcall(function()
+		return HttpService:JSONEncode(data)
+	end)
+	if ok then pcall(writefile, configFile, json) end
 end
 
--- Auto-save when inputs lose focus
 jamSelesaiBox.FocusLost:Connect(saveConfig)
-webhookBox.FocusLost:Connect(saveConfig)
+proxyBox.FocusLost:Connect(saveConfig)
 orderBox.FocusLost:Connect(saveConfig)
 storeBox.FocusLost:Connect(saveConfig)
 
--- Execute Button
-local executeBtn = Instance.new("TextButton")
+local executeBtn = Instance.new("TextButton", content)
 executeBtn.Size = UDim2.new(0.9, 0, 0, 40)
 executeBtn.BackgroundColor3 = Color3.fromRGB(88, 101, 242)
 executeBtn.BorderColor3 = Color3.fromRGB(120, 130, 255)
@@ -197,43 +161,82 @@ executeBtn.Font = Enum.Font.SourceSansBold
 executeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 executeBtn.TextSize = 18
 executeBtn.LayoutOrder = 5
-executeBtn.Parent = content
+Instance.new("UICorner", executeBtn).CornerRadius = UDim.new(0, 6)
 
-local btnCorner = Instance.new("UICorner")
-btnCorner.CornerRadius = UDim.new(0, 6)
-btnCorner.Parent = executeBtn
-
--- Execution logic
 executeBtn.MouseButton1Click:Connect(function()
-    local jam_selesai_joki = tonumber(jamSelesaiBox.Text) or 1
-    local discord_webhook = webhookBox.Text
-    local no_order = orderBox.Text
-    local nama_store = storeBox.Text
+	local jam = tonumber(jamSelesaiBox.Text)
+	local proxy_url = proxyBox.Text
+	local no_order = orderBox.Text
+	local nama_store = storeBox.Text
 
-    if discord_webhook == "" or no_order == "" or nama_store == "" then
-        executeBtn.Text = "FILL ALL FIELDS"
-        executeBtn.BackgroundColor3 = Color3.fromRGB(237, 66, 69)
-        wait(2)
-        executeBtn.Text = "EXECUTE SCRIPT"
-        executeBtn.BackgroundColor3 = Color3.fromRGB(88, 101, 242)
-        return
-    end
+	if not jam or not proxy_url or proxy_url == "" or no_order == "" or nama_store == "" then
+		executeBtn.Text = "FILL ALL FIELDS"
+		executeBtn.BackgroundColor3 = Color3.fromRGB(237, 66, 69)
+		wait(2)
+		executeBtn.Text = "EXECUTE SCRIPT"
+		executeBtn.BackgroundColor3 = Color3.fromRGB(88, 101, 242)
+		return
+	end
 
-    -- Inject _G variables and execute Webhook.lua
-    local scriptToRun = string.format([[
-_G.jam_selesai_joki = %s
-_G.discord_webhook = %q
-_G.no_order = %q
-_G.nama_store = %q
+	-- ✅ EMBED MESSAGE
+	local embedPayload = {
+		username = username,
+		embeds = {{
+			title = "JOKI STARTED",
+			description = "Username: " .. username,
+			color = 65280,
+			fields = {
+				{
+					name = "Info Joki",
+					value = "Nomor Order : " .. no_order .. "\nLink Pesanan : [Link Pesanan](https://tokoku.itemku.com/riwayat-pesanan/rincian/" .. string.sub(no_order, 9) .. ")"
+				},
+				{
+					name = "Time",
+					value = "Start: <t:" .. os.time() .. ":f>\nEnd: <t:" .. (os.time() + jam * 3600) .. ":f>"
+				}
+			},
+			footer = { text = "- " .. nama_store .. " ❤️" }
+		}}
+	}
 
-loadstring(game:HttpGet("https://raw.githubusercontent.com/afkar-gg/Roblox-Scripts/refs/heads/main/Webhook-Joki/Webhook.lua"))();
-]], jam_selesai_joki, discord_webhook, no_order, nama_store)
+	local success = pcall(function()
+		HttpService:PostAsync(proxy_url, HttpService:JSONEncode(embedPayload), Enum.HttpContentType.ApplicationJson)
+	end)
 
-    local func, err = loadstring(scriptToRun)
-    if not func then
-        warn("loadstring error:", err)
-        return
-    end
+	if success then
+		executeBtn.Text = "✅ SUCCESS!"
+		executeBtn.BackgroundColor3 = Color3.fromRGB(87, 242, 135)
+	else
+		executeBtn.Text = "FAILED TO SEND"
+		executeBtn.BackgroundColor3 = Color3.fromRGB(237, 66, 69)
+		wait(3)
+	end
 
-    pcall(func)
+	wait(2)
+	executeBtn.Text = "EXECUTE SCRIPT"
+	executeBtn.BackgroundColor3 = Color3.fromRGB(88, 101, 242)
+
+	-- 🔁 LOOP
+	local start = tick()
+	task.spawn(function()
+		while tick() - start < jam * 3600 do
+			local msg = {
+				username = username,
+				content = "✅ Username: " .. username .. "\nLast Checked: <t:" .. os.time() .. ":R>"
+			}
+			pcall(function()
+				HttpService:PostAsync(proxy_url, HttpService:JSONEncode(msg), Enum.HttpContentType.ApplicationJson)
+			end)
+			task.wait(180)
+		end
+
+		-- ✅ FINISH
+		local done = {
+			username = username,
+			content = "@everyone ✅ Joki finished for **" .. username .. "**!"
+		}
+		pcall(function()
+			HttpService:PostAsync(proxy_url, HttpService:JSONEncode(done), Enum.HttpContentType.ApplicationJson)
+		end)
+	end)
 end)
