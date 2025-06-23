@@ -16,7 +16,6 @@ local saved = {
 	proxy_url = ""
 }
 
--- Load Config
 if canSave and isfile(configFile) then
 	local ok, content = pcall(readfile, configFile)
 	if ok then
@@ -162,8 +161,6 @@ executeBtn.MouseButton1Click:Connect(function()
 		return
 	end
 
-	local HttpService = game:GetService("HttpService")
-
 	-- Send embed (/send)
 	pcall(function()
 		req({
@@ -193,7 +190,7 @@ executeBtn.MouseButton1Click:Connect(function()
 		})
 	end)
 
-	-- 🔁 Looping plain /check every 5 minutes
+	-- 🔁 Loop /check every 5 mins
 	task.spawn(function()
 		while true do
 			pcall(function()
@@ -206,13 +203,31 @@ executeBtn.MouseButton1Click:Connect(function()
 						channel_id = channel
 					})
 				})
-				print("✅ /check heartbeat sent")
 			end)
 			task.wait(300)
 		end
 	end)
 
-	executeBtn.Text = "✅ SENT & LOOPING"
+	-- ⏰ After joki ends, send /complete
+	task.spawn(function()
+		task.wait(jam * 3600)
+		pcall(function()
+			req({
+				Url = baseUrl .. "/complete",
+				Method = "POST",
+				Headers = {["Content-Type"] = "application/json"},
+				Body = HttpService:JSONEncode({
+					username = username,
+					no_order = order,
+					nama_store = store,
+					channel_id = channel
+				})
+			})
+			print("✅ Sent JOKI COMPLETED")
+		end)
+	end)
+
+	executeBtn.Text = "✅ STARTED + TIMER"
 	executeBtn.BackgroundColor3 = Color3.fromRGB(87, 242, 135)
 	task.wait(2)
 	executeBtn.Text = "EXECUTE SCRIPT"
