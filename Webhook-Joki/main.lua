@@ -108,9 +108,8 @@ local jamBox = makeInput("jam_selesai_joki", "e.g., 1", saved.jam_selesai_joki)
 local orderBox = makeInput("no_order", "e.g., OD123456", saved.no_order)
 local storeBox = makeInput("nama_store", "e.g., AfkarStore", saved.nama_store)
 local chanBox = makeInput("channel_id", "Discord Channel ID", saved.channel_id)
-local urlBox = makeInput("proxy_url", "https://xxxx.trycloudflare.com/send", saved.proxy_url)
+local urlBox = makeInput("proxy_url", "https://yourproxy.trycloudflare.com", saved.proxy_url)
 
--- Save config on change
 local function save()
 	if not canSave then return end
 	local config = {
@@ -130,61 +129,73 @@ for _, box in ipairs({jamBox, orderBox, storeBox, chanBox, urlBox}) do
 	box.FocusLost:Connect(save)
 end
 
--- Execute Button
-local exec = Instance.new("TextButton", content)
-exec.Size = UDim2.new(0.9, 0, 0, 40)
-exec.Text = "EXECUTE SCRIPT"
-exec.BackgroundColor3 = Color3.fromRGB(88, 101, 242)
-exec.TextColor3 = Color3.new(1, 1, 1)
-exec.TextSize = 18
-exec.Font = Enum.Font.SourceSansBold
-Instance.new("UICorner", exec).CornerRadius = UDim.new(0, 6)
-exec.Parent = content
+local executeBtn = Instance.new("TextButton", content)
+executeBtn.Size = UDim2.new(0.9, 0, 0, 40)
+executeBtn.Text = "EXECUTE SCRIPT"
+executeBtn.BackgroundColor3 = Color3.fromRGB(88, 101, 242)
+executeBtn.TextColor3 = Color3.new(1, 1, 1)
+executeBtn.TextSize = 18
+executeBtn.Font = Enum.Font.SourceSansBold
+Instance.new("UICorner", executeBtn).CornerRadius = UDim.new(0, 6)
+executeBtn.Parent = content
 
-exec.MouseButton1Click:Connect(function()
+executeBtn.MouseButton1Click:Connect(function()
 	local jam = tonumber(jamBox.Text)
 	local order = orderBox.Text
 	local store = storeBox.Text
 	local channel = chanBox.Text
-	local url = urlBox.Text
+	local baseUrl = urlBox.Text
 	local username = LocalPlayer.Name
 
-	if not jam or order == "" or store == "" or channel == "" or url == "" then
-		exec.Text = "FILL ALL FIELDS"
-		exec.BackgroundColor3 = Color3.fromRGB(237, 66, 69)
+	if not jam or order == "" or store == "" or channel == "" or baseUrl == "" then
+		executeBtn.Text = "FILL ALL FIELDS"
+		executeBtn.BackgroundColor3 = Color3.fromRGB(237, 66, 69)
 		task.wait(2)
-		exec.Text = "EXECUTE SCRIPT"
-		exec.BackgroundColor3 = Color3.fromRGB(88, 101, 242)
+		executeBtn.Text = "EXECUTE SCRIPT"
+		executeBtn.BackgroundColor3 = Color3.fromRGB(88, 101, 242)
 		return
 	end
 
-	-- Send POST request to proxy
-	local data = {
+	local req = http_request or request or syn and syn.request
+	if not req then
+		warn("❌ Executor does not support HTTP requests.")
+		return
+	end
+
+	-- POST to /send (embed)
+	local sendPayload = {
+		username = username,
 		jam_selesai_joki = jam,
 		no_order = order,
 		nama_store = store,
-		channel_id = channel,
-		username = username
+		channel_id = channel
 	}
+	pcall(function()
+		req({
+			Url = baseUrl .. "/send",
+			Method = "POST",
+			Headers = {["Content-Type"] = "application/json"},
+			Body = HttpService:JSONEncode(sendPayload)
+		})
+	end)
 
-	local encoded = HttpService:JSONEncode(data)
-	local req = (http_request or request or syn and syn.request)
+	-- POST to /check (plain)
+	local checkPayload = {
+		username = username,
+		channel_id = channel
+	}
+	pcall(function()
+		req({
+			Url = baseUrl .. "/check",
+			Method = "POST",
+			Headers = {["Content-Type"] = "application/json"},
+			Body = HttpService:JSONEncode(checkPayload)
+		})
+	end)
 
-	if not req then
-		warn("❌ Executor does not support http requests.")
-		exec.Text = "HTTP ERROR"
-		exec.BackgroundColor3 = Color3.fromRGB(237, 66, 69)
-		return
-	end
-
-	local res = req({
-		Url = url,
-		Method = "POST",
-		Headers = { ["Content-Type"] = "application/json" },
-		Body = encoded
-	})
-
-	exec.Text = "SENT"
+	executeBtn.Text = "✅ SENT BOTH"
+	executeBtn.BackgroundColor3 = Color3.fromRGB(87, 242, 135)
 	task.wait(2)
-	exec.Text = "EXECUTE SCRIPT"
+	executeBtn.Text = "EXECUTE SCRIPT"
+	executeBtn.BackgroundColor3 = Color3.fromRGB(88, 101, 242)
 end)
