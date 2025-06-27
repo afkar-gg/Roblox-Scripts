@@ -20,9 +20,9 @@ This project is a powerful bridge between **Roblox UI scripts** and a **Discord 
 
 ---
 File info :
-<br>proxy server = index.js
-<br>config channel id & bot token = config.json
-<br>ui loadstring script = main.lua
+- proxy server = index.js
+- config channel id & bot token = config.json
+- ui loadstring script = main.lua
 ---
 
 ## 🛠️ Setup Instructions
