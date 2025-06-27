@@ -13,5 +13,6 @@ the only difference:
 
 ~ Loadstring :
 ```lua
-loadstring(game:HttpGet("https://raw.githubusercontent.com/afkar-gg/Roblox-Scripts/refs/heads/main/Webhook-Joki/main.lua"))();
+loadstring(game:HttpGet("https://raw.githubusercontent.com/afkar-gg/Roblox-Scripts/ccc27be9581e2c3b643bb19713107aef081e1701/Webhook-Joki/main.lua"))();
 ```
+> the loadstring are temporarily using ccc27be version because im lazy to update it
