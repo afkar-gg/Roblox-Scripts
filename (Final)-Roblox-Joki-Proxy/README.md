@@ -1,4 +1,4 @@
-# 🧠 Joki Discord Bot Proxy (Roblox ↔ Discord)
+# 🧠 Discord Bot Proxy (Roblox ↔ Discord)
 
 This project is a powerful bridge between **Roblox UI scripts** and a **Discord bot**, allowing seamless webhook-like interactions using a real bot instead of webhooks — perfect for Joki services, AFK farming monitors, or client status tracking.
 
@@ -59,10 +59,10 @@ node index.js
 ```
 This will output a Cloudflare tunnel like:
 
-🌍 Tunnel URL: https://yourname.trycloudflare.com
-➡️ Ready: /send /check /complete
+![the](https://raw.githubusercontent.com/afkar-gg/Roblox-Scripts/refs/heads/Readme-Assets/(Final)-Roblox-Joki-Proxy/Screenshot_20250627_125018.png)
 
 Use this URL in your Roblox UI script's config.
+> if you didn't see it, scroll a little bit up
 
 ---
 ## Setup Instructions (Roblox)
