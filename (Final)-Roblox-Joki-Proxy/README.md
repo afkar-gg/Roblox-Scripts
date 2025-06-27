@@ -63,9 +63,6 @@ This will output a Cloudflare tunnel like:
 
 Use this URL in your Roblox UI script's config.
 
-- Should be look like this on Discord (after setup the roblox script)
-
-![Discord](https://raw.githubusercontent.com/afkar-gg/Roblox-Scripts/refs/heads/Readme-Assets/(Final)-Roblox-Joki-Proxy/IMG_20250627_115836.png)
 ---
 ## Setup Instructions (Roblox)
 
@@ -81,6 +78,11 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/afkar-gg/Roblox-Scrip
 ### Example :
 ![example](https://raw.githubusercontent.com/afkar-gg/Roblox-Scripts/refs/heads/Readme-Assets/(Final)-Roblox-Joki-Proxy/Screenshot_2025_0627_121535_com.geniuscloud.overseasplatform.png)
 > tip : the execute button would have a little delay to turn green. if it's not, you put the url wrong (try to put it like in the image)
+
+- Should be look like this on Discord (after setup the roblox script)
+
+![Discord](https://raw.githubusercontent.com/afkar-gg/Roblox-Scripts/refs/heads/Readme-Assets/(Final)-Roblox-Joki-Proxy/IMG_20250627_115836.png)
+
 ---
 
 🤖 Roblox UI Script Features
