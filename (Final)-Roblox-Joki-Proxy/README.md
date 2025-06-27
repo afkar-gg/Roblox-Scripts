@@ -30,6 +30,7 @@ File info :
 ```bash
 apt update && apt upgrade
 ```
+> the command above if you just downloaded termux
 ### 1. Install Important Package
 ```bash
 pkg install git nodejs cloudflared
