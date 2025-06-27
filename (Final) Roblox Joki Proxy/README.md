@@ -25,18 +25,22 @@ File info :
 - ui loadstring script = main.lua
 ---
 
-## 🛠️ Setup Instructions
+## 🛠️ Setup Instructions (Termux)
 
-### 1. Clone the Repo
+### 1. Install Important Package
+```bash
+pkg install git nodejs
+```
+### 2. Clone the Repo
 
 ```bash
 git clone https://github.com/afkar-gg/bot/ afkar-proxy && cd afkar-proxy
 ```
-### 2. Install Dependencies
+### 3. Install Dependencies
 ```bash
 npm install node-fetch@2 express
 ```
-### 3. Create a config.json File
+### 4. Create a config.json File
 ```bash
 {
   "BOT_TOKEN": "your_discord_bot_token_here",
@@ -45,7 +49,7 @@ npm install node-fetch@2 express
 ```
 > 🔐 Never share this file publicly.
 
-### 4. Start the Proxy
+### 5. Start the Proxy
 ```bash
 node index.js
 ```
@@ -56,7 +60,10 @@ This will output a Cloudflare tunnel like:
 
 Use this URL in your Roblox UI script's config.
 
+---
+## Setup Instructions (Roblox)
 
+### 1. Execute The Script 
 ---
 
 🤖 Roblox UI Script Features
