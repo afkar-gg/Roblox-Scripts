@@ -32,18 +32,18 @@ File info :
 ```bash
 git clone https://github.com/afkar-gg/Roblox-Script/
 cd 
-
-2. Install Dependencies
-
+```
+### 2. Install Dependencies
+```bash
 npm install
-
-3. Create a config.json File
-
+```
+### 3. Create a config.json File
+```bash
 {
   "BOT_TOKEN": "your_discord_bot_token_here",
   "CHANNEL_ID": "your_default_channel_id_here"
 }
-
+```
 > 🔐 Never share this file publicly.
 
 
