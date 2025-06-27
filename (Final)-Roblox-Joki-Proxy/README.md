@@ -60,6 +60,9 @@ This will output a Cloudflare tunnel like:
 
 Use this URL in your Roblox UI script's config.
 
+- Should be look like this on Discord (after setul the roblox script)
+
+![Discord](https://raw.githubusercontent.com/afkar-gg/Roblox-Scripts/refs/heads/Readme-Assets/(Final)-Roblox-Joki-Proxy/IMG_20250627_115836.png)
 ---
 ## Setup Instructions (Roblox)
 
