@@ -26,10 +26,13 @@ File info :
 ---
 
 ## 🛠️ Setup Instructions (Termux)
-
+### (Disclaimer) If you just downloaded termux, update and upgrade the apt
+```bash
+apt update && apt upgrade
+```
 ### 1. Install Important Package
 ```bash
-pkg install git nodejs
+pkg install git nodejs cloudflared
 ```
 ### 2. Clone the Repo
 
