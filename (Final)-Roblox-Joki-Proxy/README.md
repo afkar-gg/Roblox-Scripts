@@ -141,11 +141,3 @@ Powered by Cloudflare Tunnel
 Uses Discord Bot API
 
 Roblox client uses HttpService, GUI and loadstring in Luau
-
-
-
----
-
-📜 License
-
-MIT — Free to use, modify and contribute.
