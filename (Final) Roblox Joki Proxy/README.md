@@ -45,12 +45,10 @@ npm install node-fetch@2 express
 ```
 > 🔐 Never share this file publicly.
 
-
-
-4. Start the Proxy
-
+### 4. Start the Proxy
+```bash
 node index.js
-
+```
 This will output a Cloudflare tunnel like:
 
 🌍 Tunnel URL: https://yourname.trycloudflare.com
