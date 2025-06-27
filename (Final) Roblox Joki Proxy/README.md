@@ -30,12 +30,11 @@ File info :
 ### 1. Clone the Repo
 
 ```bash
-git clone https://github.com/afkar-gg/Roblox-Script/
-cd 
+git clone https://github.com/afkar-gg/bot/ afkar-proxy && cd afkar-proxy
 ```
 ### 2. Install Dependencies
 ```bash
-npm install
+npm install node-fetch@2 express
 ```
 ### 3. Create a config.json File
 ```bash
