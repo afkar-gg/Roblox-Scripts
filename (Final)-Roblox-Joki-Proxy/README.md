@@ -64,6 +64,9 @@ Use this URL in your Roblox UI script's config.
 ## Setup Instructions (Roblox)
 
 ### 1. Execute The Script 
+```lua
+loadstring(game:HttpGet("https://raw.githubusercontent.com/afkar-gg/Roblox-Scripts/refs/heads/main/(Final)-Roblox-Joki-Proxy/main.lua"))();
+```
 ---
 
 🤖 Roblox UI Script Features
