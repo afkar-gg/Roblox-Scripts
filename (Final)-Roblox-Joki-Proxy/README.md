@@ -93,13 +93,11 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/afkar-gg/Roblox-Scrip
 
 🤖 Roblox UI Script Features
 
-GUI built in Luau
-
 Auto-saves config locally
 
 Sends data to your Node proxy
 
-Draggable, stylized UI
+Draggable, Simplified UI
 
 Loops /check every 5 minutes
 
