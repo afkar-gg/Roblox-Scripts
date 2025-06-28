@@ -45,6 +45,11 @@ git clone https://github.com/afkar-gg/bot/ afkar-proxy && cd afkar-proxy
 npm install node-fetch@2 express
 ```
 ### 4. Create a config.json File
+Create a config.json file using
+```bash
+nano config.json
+```
+and then put the code below, don't forget to fill the bot token and discord channel id
 ```bash
 {
   "BOT_TOKEN": "your_discord_bot_token_here",
