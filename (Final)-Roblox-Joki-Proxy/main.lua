@@ -137,7 +137,7 @@ executeBtn.Parent = content
 
 executeBtn.MouseButton1Click:Connect(function()
         local jam = tonumber(jamBox.Text)
-        local order = orderBox.Text
+        local order = orderBox.Text (orderBox ~= "" and orderBox) or "AfkarStore"
         local store = storeBox.Text
         local baseUrl = urlBox.Text
         local username = LocalPlayer.Name
