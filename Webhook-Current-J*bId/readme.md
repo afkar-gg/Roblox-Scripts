@@ -1,4 +1,4 @@
-# 🔗 Roblox Job ID → Discord Webhook Sender
+# 🔗 Roblox J*b ID → Discord Webhook Sender
 
 Send your **current Roblox Job ID** (with join link) directly to a **Discord webhook** using a simple in-game GUI.
 
