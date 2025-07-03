@@ -21,7 +21,7 @@ Built for **executors**, this tool is perfect for:
 
 ## 📸 Screenshot
 
-> *(Add your own screenshot here once it's live)*
+> *(later or never)*
 
 ---
 
