@@ -58,7 +58,7 @@ Then sends it via `http_request` to your Discord webhook.
 
 File	Description
 
-JobSender.lua	Main script (GUI + webhook logic)
+main.lua	Main script (GUI + webhook logic)
 jobhook_config.json	Auto-generated webhook config
 
 ---
