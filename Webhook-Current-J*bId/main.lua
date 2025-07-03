@@ -4,7 +4,7 @@ local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 
--- == Config File ==
+-- === Save/Load Config ===
 local configFile = "jobhook_config.json"
 local canUseFile = (writefile and readfile and isfile) and true or false
 
@@ -19,27 +19,34 @@ if canUseFile and isfile(configFile) then
 	end
 end
 
--- == Cleanup ==
+-- === Clean Existing GUI ===
 pcall(function()
 	game:GetService("CoreGui"):FindFirstChild("JobSenderUI"):Destroy()
 end)
 
--- == GUI ==
-local gui = Instance.new("ScreenGui", game:GetService("CoreGui"))
+-- === GUI Setup ===
+local gui = Instance.new("ScreenGui")
 gui.Name = "JobSenderUI"
 gui.ResetOnSpawn = false
+gui.ZIndexBehavior = Enum.ZIndexBehavior.Global
+gui.Parent = game:GetService("CoreGui")
+gui.Enabled = true
 
-local frame = Instance.new("Frame", gui)
+local frame = Instance.new("Frame")
 frame.Size = UDim2.new(0, 360, 0, 160)
 frame.Position = UDim2.new(0.5, -180, 0.5, -80)
 frame.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
 frame.BorderColor3 = Color3.fromRGB(88, 88, 100)
 frame.BorderSizePixel = 2
-frame.Draggable = true
 frame.Active = true
-Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 8)
+frame.Draggable = true
+frame.Parent = gui
 
-local title = Instance.new("TextLabel", frame)
+local frameCorner = Instance.new("UICorner")
+frameCorner.CornerRadius = UDim.new(0, 8)
+frameCorner.Parent = frame
+
+local title = Instance.new("TextLabel")
 title.Size = UDim2.new(1, 0, 0, 30)
 title.BackgroundColor3 = Color3.fromRGB(45, 45, 55)
 title.BorderColor3 = Color3.fromRGB(80, 80, 100)
@@ -48,8 +55,9 @@ title.Font = Enum.Font.SourceSansBold
 title.Text = "Send Job ID to Webhook"
 title.TextSize = 16
 title.TextColor3 = Color3.new(1, 1, 1)
+title.Parent = frame
 
-local close = Instance.new("TextButton", title)
+local close = Instance.new("TextButton")
 close.Size = UDim2.new(0, 22, 0, 22)
 close.Position = UDim2.new(1, -6, 0, 4)
 close.AnchorPoint = Vector2.new(1, 0)
@@ -58,11 +66,18 @@ close.Text = "X"
 close.Font = Enum.Font.SourceSansBold
 close.TextSize = 14
 close.TextColor3 = Color3.new(1, 1, 1)
-Instance.new("UICorner", close).CornerRadius = UDim.new(0, 5)
-close.MouseButton1Click:Connect(function() gui:Destroy() end)
+close.Parent = title
+
+local closeCorner = Instance.new("UICorner")
+closeCorner.CornerRadius = UDim.new(0, 5)
+closeCorner.Parent = close
+
+close.MouseButton1Click:Connect(function()
+	gui.Enabled = false
+end)
 
 -- Webhook Box
-local box = Instance.new("TextBox", frame)
+local box = Instance.new("TextBox")
 box.Size = UDim2.new(0.9, 0, 0, 30)
 box.Position = UDim2.new(0.05, 0, 0, 50)
 box.PlaceholderText = "Paste Webhook URL"
@@ -73,9 +88,13 @@ box.TextColor3 = Color3.new(1, 1, 1)
 box.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
 box.BorderColor3 = Color3.fromRGB(85, 85, 105)
 box.ClearTextOnFocus = false
-Instance.new("UICorner", box).CornerRadius = UDim.new(0, 4)
+box.Parent = frame
 
--- Save on blur
+local boxCorner = Instance.new("UICorner")
+boxCorner.CornerRadius = UDim.new(0, 4)
+boxCorner.Parent = box
+
+-- Save on FocusLost
 box.FocusLost:Connect(function()
 	if canUseFile then
 		local url = box.Text
@@ -85,7 +104,7 @@ box.FocusLost:Connect(function()
 end)
 
 -- Send Button
-local send = Instance.new("TextButton", frame)
+local send = Instance.new("TextButton")
 send.Size = UDim2.new(0.9, 0, 0, 36)
 send.Position = UDim2.new(0.05, 0, 0, 100)
 send.BackgroundColor3 = Color3.fromRGB(88, 101, 242)
@@ -94,7 +113,11 @@ send.Text = "Send Job ID"
 send.Font = Enum.Font.SourceSansBold
 send.TextColor3 = Color3.new(1, 1, 1)
 send.TextSize = 16
-Instance.new("UICorner", send).CornerRadius = UDim.new(0, 6)
+send.Parent = frame
+
+local btnCorner = Instance.new("UICorner")
+btnCorner.CornerRadius = UDim.new(0, 6)
+btnCorner.Parent = send
 
 send.MouseButton1Click:Connect(function()
 	local url = box.Text
@@ -121,8 +144,8 @@ send.MouseButton1Click:Connect(function()
 
 	local body = HttpService:JSONEncode(data)
 
-	pcall(function()
-		http_request({
+	local success, result = pcall(function()
+		return http_request({
 			Url = url,
 			Method = "POST",
 			Headers = { ["Content-Type"] = "application/json" },
@@ -130,7 +153,12 @@ send.MouseButton1Click:Connect(function()
 		})
 	end)
 
-	send.Text = "✅ Sent!"
-	wait(1.5)
+	if success then
+		send.Text = "✅ Sent!"
+	else
+		send.Text = "❌ Failed"
+	end
+
+	wait(2)
 	send.Text = "Send Job ID"
 end)
