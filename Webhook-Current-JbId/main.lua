@@ -5,24 +5,34 @@ local Players = game:GetService("Players")
 local CoreGui = game:GetService("CoreGui")
 local player = Players.LocalPlayer
 
-local placeId, jobId = game.PlaceId, game.JobId
-local joinLink = ("roblox://placeId=%s&gameInstanceId=%s"):format(placeId, jobId)
+-- Roblox Data
 local username = player.Name
+local placeId = game.PlaceId
+local jobId = game.JobId
+local tunnelURL = "https://your-proxy.trycloudflare.com" -- 🔁 CHANGE THIS
 
+-- Build join link
+local joinLink = ("%s/join?place=%s&job=%s"):format(tunnelURL, placeId, jobId)
+
+-- Load webhook URL from file
 local configFile = "jobhook_config.json"
 local canSave = writefile and readfile and isfile
-local webhook = ""
+local savedWebhook = ""
 
 if canSave and isfile(configFile) then
-	local ok, data = pcall(readfile, configFile)
-	if ok then
-		local decoded = HttpService:JSONDecode(data)
-		webhook = decoded.webhook or ""
-	end
+    local ok, content = pcall(readfile, configFile)
+    if ok then
+        local decoded = HttpService:JSONDecode(content)
+        savedWebhook = decoded.webhook or ""
+    end
 end
 
-pcall(function() CoreGui:FindFirstChild("JobHookUI"):Destroy() end)
+-- Clear previous UI
+pcall(function()
+    CoreGui:FindFirstChild("JobHookUI"):Destroy()
+end)
 
+-- UI Setup
 local gui = Instance.new("ScreenGui", CoreGui)
 gui.Name = "JobHookUI"
 
@@ -54,14 +64,16 @@ close.Font = Enum.Font.SourceSansBold
 close.TextColor3 = Color3.new(1, 1, 1)
 close.TextSize = 14
 close.BackgroundColor3 = Color3.fromRGB(231, 76, 60)
-close.MouseButton1Click:Connect(function() gui:Destroy() end)
+close.MouseButton1Click:Connect(function()
+    gui.Enabled = false
+end)
 Instance.new("UICorner", close).CornerRadius = UDim.new(0, 6)
 
 local box = Instance.new("TextBox", frame)
 box.Size = UDim2.new(0.9, 0, 0, 30)
 box.Position = UDim2.new(0.05, 0, 0, 40)
 box.PlaceholderText = "Paste Webhook URL"
-box.Text = webhook
+box.Text = savedWebhook
 box.Font = Enum.Font.SourceSans
 box.TextSize = 14
 box.TextColor3 = Color3.new(1, 1, 1)
@@ -71,9 +83,9 @@ box.TextWrapped = true
 Instance.new("UICorner", box).CornerRadius = UDim.new(0, 4)
 
 box.FocusLost:Connect(function()
-	if canSave then
-		pcall(writefile, configFile, HttpService:JSONEncode({ webhook = box.Text }))
-	end
+    if canSave then
+        pcall(writefile, configFile, HttpService:JSONEncode({ webhook = box.Text }))
+    end
 end)
 
 local send = Instance.new("TextButton", frame)
@@ -88,33 +100,32 @@ send.TextSize = 16
 Instance.new("UICorner", send).CornerRadius = UDim.new(0, 6)
 
 send.MouseButton1Click:Connect(function()
-	local url = box.Text
-	if url == "" then
-		send.Text = "Missing URL"
-		wait(1.5)
-		send.Text = "Send Job ID"
-		return
-	end
+    local url = box.Text
+    if url == "" then
+        send.Text = "Missing URL"
+        wait(1.5)
+        send.Text = "Send Job ID"
+        return
+    end
 
-	local data = {
-		embeds = {{
-			title = "📡 Roblox Job ID",
-			description = ("**Username:** `%s`\n**Job ID:** `%s`\n🔗 ``roblox://placeId=%s&gameInstanceId=%s``")
-	:format(username, jobId, placeId, jobId),
-			color = 0x00FFFF
-		}}
-	}
+    local embed = {
+        embeds = {{
+            title = "📡 Roblox Job ID",
+            description = ("**Username:** `%s`\n🔗 [Join Server](%s)"):format(username, joinLink),
+            color = 0x00FFFF
+        }}
+    }
 
-	local ok = pcall(function()
-		http_request({
-			Url = url,
-			Method = "POST",
-			Headers = { ["Content-Type"] = "application/json" },
-			Body = HttpService:JSONEncode(data)
-		})
-	end)
+    local ok = pcall(function()
+        (http_request or request or syn and syn.request)({
+            Url = url,
+            Method = "POST",
+            Headers = { ["Content-Type"] = "application/json" },
+            Body = HttpService:JSONEncode(embed)
+        })
+    end)
 
-	send.Text = ok and "✅ Sent!" or "❌ Failed"
-	wait(2)
-	send.Text = "Send Job ID"
+    send.Text = ok and "✅ Sent!" or "❌ Failed"
+    wait(2)
+    send.Text = "Send Job ID"
 end)
