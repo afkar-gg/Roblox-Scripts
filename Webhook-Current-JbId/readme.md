@@ -28,7 +28,7 @@ Built for **executors**, this tool is perfect for:
 ## 📜 Script 
 ~ Loadstring :
 ```lua
-loadstring(game:HttpGet("https://raw.githubusercontent.com/afkar-gg/Roblox-Scripts/refs/heads/main/Webhook-Current-J*bId/main.lua"))
+loadstring(game:HttpGet("https://raw.githubusercontent.com/afkar-gg/Roblox-Scripts/refs/heads/main/Webhook-Current-JbId/main.lua"))
 ```
 
 ---
