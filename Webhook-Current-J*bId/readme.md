@@ -52,12 +52,6 @@ Then sends it via `http_request` to your Discord webhook.
 
 ![Embed example](https://fake.link/your-screenshot.png)
 
-```text
-📡 Roblox Job ID
-Job ID: ABCDEF123456
-🔗 [Join Server](https://www.roblox.com/games/PLACEID?jobId=ABCDEF123456)
-
-
 ---
 
 📂 Files
