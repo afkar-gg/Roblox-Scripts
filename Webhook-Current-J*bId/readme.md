@@ -25,6 +25,14 @@ Built for **executors**, this tool is perfect for:
 
 ---
 
+## 📜 Script 
+~ Loadstring :
+```lua
+loadstring(game:HttpGet(""))
+```
+
+---
+
 ## 🧩 How It Works
 
 This script fetches your:
