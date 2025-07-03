@@ -99,7 +99,7 @@ send.MouseButton1Click:Connect(function()
 	local data = {
 		embeds = {{
 			title = "📡 Roblox Job ID",
-			description = ("**Username:** `%s`\n**Job ID:** `%s`\n🔗 # ``roblox://placeId=%s&gameInstanceId=%s``")
+			description = ("**Username:** `%s`\n**Job ID:** `%s`\n🔗 ``roblox://placeId=%s&gameInstanceId=%s``")
 	:format(username, jobId, placeId, jobId),
 			color = 0x00FFFF
 		}}
