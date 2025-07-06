@@ -3,7 +3,6 @@ if not game:GetService("Players").LocalPlayer then return end
 
 local Players = game:GetService("Players")
 local HttpService = game:GetService("HttpService")
-local RunService = game:GetService("RunService")
 local player = Players.LocalPlayer
 
 -- Default Config
@@ -13,6 +12,27 @@ local saved = {
 	nama_store = "",
 	proxy_url = ""
 }
+
+-- === Persistent Save Support ===
+local configFolder = "joki_config"
+local configFile = configFolder .. "/config.json"
+local canSave = isfile and writefile and readfile and makefolder
+
+-- Create folder
+if canSave and not isfolder(configFolder) then
+	pcall(makefolder, configFolder)
+end
+
+-- Load config if it exists
+if canSave and isfile(configFile) then
+	local success, data = pcall(readfile, configFile)
+	if success then
+		local decoded = HttpService:JSONDecode(data)
+		for k, v in pairs(decoded) do
+			saved[k] = v
+		end
+	end
+end
 
 -- === GUI SETUP ===
 pcall(function()
@@ -30,7 +50,6 @@ frame.Position = UDim2.new(0.5, -200, 0.5, -200)
 frame.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
 frame.BorderColor3 = Color3.fromRGB(85, 85, 105)
 frame.BorderSizePixel = 2
-frame.Active, frame.Draggable = true
 Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 8)
 
 local titleBar = Instance.new("Frame", frame)
@@ -38,7 +57,7 @@ titleBar.Size = UDim2.new(1, 0, 0, 30)
 titleBar.BackgroundColor3 = Color3.fromRGB(45, 45, 55)
 titleBar.BorderColor3 = Color3.fromRGB(85, 85, 105)
 
--- Custom drag behavior
+-- Manual drag (custom, reliable)
 titleBar.InputBegan:Connect(function(input)
 	if input.UserInputType == Enum.UserInputType.MouseButton1 then
 		local startPos = input.Position
@@ -99,7 +118,7 @@ layout.SortOrder = Enum.SortOrder.LayoutOrder
 layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 Instance.new("UIPadding", content).PaddingTop = UDim.new(0, 10)
 
--- Helper function for creating input boxes
+-- Input field helper
 local function makeInput(name, placeholder, order)
 	local container = Instance.new("Frame", content)
 	container.Size = UDim2.new(0.9, 0, 0, 50)
@@ -129,9 +148,15 @@ local function makeInput(name, placeholder, order)
 	box.TextWrapped = true
 	Instance.new("UICorner", box).CornerRadius = UDim.new(0, 4)
 
-	box:GetPropertyChangedSignal("Text"):Connect(function()
+	local function saveConfig()
 		saved[name] = box.Text
-	end)
+		if canSave then
+			pcall(writefile, configFile, HttpService:JSONEncode(saved))
+		end
+	end
+
+	box:GetPropertyChangedSignal("Text"):Connect(saveConfig)
+	box.FocusLost:Connect(saveConfig)
 
 	return box
 end
@@ -141,6 +166,15 @@ local orderBox = makeInput("no_order", "e.g., OD000001", 2)
 local storeBox = makeInput("nama_store", "e.g., AfkarStore", 3)
 local urlBox = makeInput("proxy_url", "https://your.proxy/send", 4)
 
+local countdownLabel = Instance.new("TextLabel", content)
+countdownLabel.Size = UDim2.new(0.9, 0, 0, 20)
+countdownLabel.Text = ""
+countdownLabel.TextColor3 = Color3.new(1, 1, 1)
+countdownLabel.Font = Enum.Font.SourceSans
+countdownLabel.TextSize = 14
+countdownLabel.BackgroundTransparency = 1
+countdownLabel.LayoutOrder = 5
+
 local executeBtn = Instance.new("TextButton", content)
 executeBtn.Size = UDim2.new(0.9, 0, 0, 40)
 executeBtn.Text = "EXECUTE SCRIPT"
@@ -149,16 +183,8 @@ executeBtn.TextColor3 = Color3.new(1, 1, 1)
 executeBtn.TextSize = 18
 executeBtn.BackgroundColor3 = Color3.fromRGB(88, 101, 242)
 executeBtn.BorderColor3 = Color3.fromRGB(120, 130, 255)
+executeBtn.LayoutOrder = 6
 Instance.new("UICorner", executeBtn).CornerRadius = UDim.new(0, 6)
-
-local countdownLabel = Instance.new("TextLabel", content)
-countdownLabel.Size = UDim2.new(0.9, 0, 0, 20)
-countdownLabel.Text = ""
-countdownLabel.TextColor3 = Color3.new(1, 1, 1)
-countdownLabel.Font = Enum.Font.SourceSans
-countdownLabel.TextSize = 14
-countdownLabel.BackgroundTransparency = 1
-countdownLabel.LayoutOrder = 6
 
 local jobBtn = Instance.new("TextButton", content)
 jobBtn.Size = UDim2.new(0.9, 0, 0, 30)
@@ -171,7 +197,7 @@ jobBtn.BorderColor3 = Color3.fromRGB(120, 160, 255)
 Instance.new("UICorner", jobBtn).CornerRadius = UDim.new(0, 6)
 jobBtn.LayoutOrder = 7
 
--- === EXECUTION ===
+-- === EXECUTE ===
 executeBtn.MouseButton1Click:Connect(function()
 	local jam = tonumber(saved.jam_selesai_joki) or 1
 	local order = saved.no_order
