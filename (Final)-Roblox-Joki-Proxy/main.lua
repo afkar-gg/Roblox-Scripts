@@ -38,6 +38,34 @@ titleBar.Size = UDim2.new(1, 0, 0, 30)
 titleBar.BackgroundColor3 = Color3.fromRGB(45, 45, 55)
 titleBar.BorderColor3 = Color3.fromRGB(85, 85, 105)
 
+-- Custom drag behavior
+titleBar.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		local startPos = input.Position
+		local startOffset = frame.Position
+
+		local connMove, connEnd
+		connMove = game:GetService("UserInputService").InputChanged:Connect(function(moveInput)
+			if moveInput.UserInputType == Enum.UserInputType.MouseMovement then
+				local delta = moveInput.Position - startPos
+				frame.Position = UDim2.new(
+					startOffset.X.Scale,
+					startOffset.X.Offset + delta.X,
+					startOffset.Y.Scale,
+					startOffset.Y.Offset + delta.Y
+				)
+			end
+		end)
+
+		connEnd = game:GetService("UserInputService").InputEnded:Connect(function(endInput)
+			if endInput.UserInputType == Enum.UserInputType.MouseButton1 then
+				connMove:Disconnect()
+				connEnd:Disconnect()
+			end
+		end)
+	end
+end)
+
 local titleLabel = Instance.new("TextLabel", titleBar)
 titleLabel.Size = UDim2.fromScale(1, 1)
 titleLabel.Position = UDim2.fromScale(0.5, 0.5)
