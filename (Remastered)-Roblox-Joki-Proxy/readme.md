@@ -2,15 +2,15 @@
 
 This project lets a Roblox executor script communicate with a Discord bot (via Node.js proxy), allowing live joki session tracking with:
 
-🔐 Password-protected dashboard
+- 🔐 Password-protected dashboard
 
-📥 Web-based session configuration
+- 📥 Web-based session configuration
 
-⏱️ Reconnect-friendly execution & timer tracking
+- ⏱️ Reconnect-friendly execution & timer tracking
 
-📲 Discord embed notifications
+- 📲 Discord embed notifications
 
-🟢 Watchdog-based offline detection
+- 🟢 Watchdog-based offline detection
 
 
 
@@ -20,14 +20,14 @@ This project lets a Roblox executor script communicate with a Discord bot (via N
 
 This repo contains:
 
-✅ main.lua: Roblox UI script (executor-compatible)
+- ✅ main.lua: Roblox UI script (executor-compatible)
 
-🖼️ /screenshots/: reserved for interface previews (add your own!)
+- 🖼️ /screenshots/: reserved for interface previews (add your own!)
 
-📄 README.md: you're looking at it 😉
+- 📄 README.md: you're looking at it 😉
 
 
-👉 NOTE: The actual index.js and config.json for the proxy backend are located in a separate repo and are cloned during setup.
+> NOTE: The actual index.js and config.json for the proxy backend are located in a separate repo and are cloned during setup.
 
 
 ---
