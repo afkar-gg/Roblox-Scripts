@@ -109,13 +109,23 @@ Here’s what you’ll see:
 
 - "/check" endpoint
 ![quality](https://raw.githubusercontent.com/afkar-gg/Roblox-Scripts/refs/heads/Readme-Assets/(Final)-Roblox-Joki-Proxy/Screenshot_2025_0708_001133_com.kiwibrowser.browser.png)
+
 - "/dashboard" endpoint
 ![sigma](https://raw.githubusercontent.com/afkar-gg/Roblox-Scripts/refs/heads/Readme-Assets/(Final)-Roblox-Joki-Proxy/Screenshot_2025_0708_001149_com.kiwibrowser.browser.png)
 
 📡 Discord Embed Example:
 
-(Insert image here)
+- Start from /track
+![deeznut](https://raw.githubusercontent.com/afkar-gg/Roblox-Scripts/refs/heads/Readme-Assets/(Final)-Roblox-Joki-Proxy/Screenshot_2025_0707_202342.png)
 
+- Checked from /check
+![skibidi](https://raw.githubusercontent.com/afkar-gg/Roblox-Scripts/refs/heads/Readme-Assets/(Final)-Roblox-Joki-Proxy/Screenshot_2025_0708_002202.png)
+
+- Offline detected for not sending /check after 3 mins <br>
+(image's on progress)
+
+- Completed from /complete 
+![lol](https://raw.githubusercontent.com/afkar-gg/Roblox-Scripts/refs/heads/Readme-Assets/(Final)-Roblox-Joki-Proxy/Screenshot_2025_0707_200859.png)
 
 ---
 
