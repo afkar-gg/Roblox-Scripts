@@ -56,8 +56,7 @@ npm install express node-fetch cookie-parser
 
 All in one :
 ```bash
-pkg install nodejs git cloudflared -y && git clone https://github.com/afkar-gg/Joki-Index
-cd Roblox-Joki-Proxy Afkar-Proxy && cd Afkar-proxy && npm install express node-fetch cookie-parser
+pkg install nodejs git cloudflared -y && git clone https://github.com/afkar-gg/Joki-Index cd Roblox-Joki-Proxy Afkar-Proxy && cd Afkar-proxy && npm install express node-fetch cookie-parser
 ```
 
 4. Fill in config.json:
