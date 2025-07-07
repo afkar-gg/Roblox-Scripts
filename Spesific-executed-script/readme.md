@@ -5,5 +5,5 @@ nothing, just a script that's execute if :<br>
 
 ~ loasdstring :
 ```lua
-
+loadstring(game:HttpGet("https://raw.githubusercontent.com/afkar-gg/Roblox-Scripts/refs/heads/main/Spesific-executed-script/main.lua"))();
 ```
