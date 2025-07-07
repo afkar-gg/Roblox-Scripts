@@ -101,13 +101,16 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/afkar-gg/Roblox-Scrip
 
 Here’s what you’ll see:
 
-🎮 Roblox UI:
+🎮 Roblox UI (ignore the quality) :
 
-(Insert image here)
+![pro](https://raw.githubusercontent.com/afkar-gg/Roblox-Scripts/refs/heads/Readme-Assets/(Final)-Roblox-Joki-Proxy/IMG_20250708_001045.png)
 
 🛠️ Dashboard Page:
 
-(Insert image here)
+- "/check" endpoint
+![quality](https://raw.githubusercontent.com/afkar-gg/Roblox-Scripts/refs/heads/Readme-Assets/(Final)-Roblox-Joki-Proxy/Screenshot_2025_0708_001133_com.kiwibrowser.browser.png)
+- "/dashboard" endpoint
+![sigma](https://raw.githubusercontent.com/afkar-gg/Roblox-Scripts/refs/heads/Readme-Assets/(Final)-Roblox-Joki-Proxy/Screenshot_2025_0708_001149_com.kiwibrowser.browser.png)
 
 📡 Discord Embed Example:
 
