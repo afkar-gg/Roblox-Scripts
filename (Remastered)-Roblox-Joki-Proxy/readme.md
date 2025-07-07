@@ -45,8 +45,7 @@ pkg install nodejs git cloudflared
 
 
 ```bash
-git clone https://github.com/afkar-gg/bot-proxy.git
-cd Roblox-Joki-Proxy Afkar-Proxy && cd Afkar-proxy
+git clone https://github.com/afkar-gg/bot-proxy.git Afkar-Proxy && cd Afkar-proxy
 ```
 
 3. Install Dependencies:
