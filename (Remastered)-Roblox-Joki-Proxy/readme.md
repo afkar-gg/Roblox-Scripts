@@ -114,6 +114,10 @@ Here’s what you’ll see:
 
 ### 📡 Discord Embed Example:
 
+- J*bId embedded information from /send-job
+![nonig](https://raw.githubusercontent.com/afkar-gg/Roblox-Scripts/refs/heads/Readme-Assets/(Final)-Roblox-Joki-Proxy/Screenshot_2025_0708_003452.png)
+
+
 - Start from /track
 ![deeznut](https://raw.githubusercontent.com/afkar-gg/Roblox-Scripts/refs/heads/Readme-Assets/(Final)-Roblox-Joki-Proxy/Screenshot_2025_0707_202342.png)
 
