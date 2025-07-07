@@ -88,9 +88,9 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/afkar-gg/Roblox-Scrip
 
 ✅ This script only asks for your proxy URL. Then you can:
 
-🟢 Start a joki session (linked to your dashboard)
+- 🟢 Start a joki session (linked to your dashboard)
 
-📩 Send your current jobId to Discord
+- 📩 Send your current jobId to Discord
 
 
 
