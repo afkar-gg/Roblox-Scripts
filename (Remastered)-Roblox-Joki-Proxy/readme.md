@@ -16,7 +16,7 @@ This project lets a Roblox executor script communicate with a Discord bot (via N
 
 ---
 
-📁 Repo Contents
+## 📁 Repo Contents
 
 This repo contains:
 
@@ -32,7 +32,7 @@ This repo contains:
 
 ---
 
-🚀 How to Set Up the Proxy (via Termux)
+## 🚀 How to Set Up the Proxy (via Termux)
 
 1. Install Requirements:
 ```bash
@@ -53,7 +53,7 @@ git clone https://github.com/afkar-gg/bot-proxy.git Afkar-Proxy && cd Afkar-prox
 npm install express node-fetch cookie-parser
 ```
 
-All in one :
+### All in one :
 ```bash
 pkg install nodejs git cloudflared -y && git clone https://github.com/afkar-gg/bot-proxy.git Afkar-Proxy && cd Afkar-proxy && npm install express node-fetch cookie-parser
 ```
@@ -78,7 +78,7 @@ node index.js
 
 ---
 
-💻 Roblox Script Setup (Executor)
+## 💻 Roblox Script Setup (Executor)
 
 Paste this in your executor to launch the Roblox-side UI:
 
@@ -96,15 +96,15 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/afkar-gg/Roblox-Scrip
 
 ---
 
-🖼 Screenshots
+## 🖼 Screenshots
 
 Here’s what you’ll see:
 
-🎮 Roblox UI (ignore the quality) :
+### 🎮 Roblox UI (ignore the quality) :
 
 ![pro](https://raw.githubusercontent.com/afkar-gg/Roblox-Scripts/refs/heads/Readme-Assets/(Final)-Roblox-Joki-Proxy/IMG_20250708_001045.png)
 
-🛠️ Dashboard Page:
+### 🛠️ Dashboard Page:
 
 - "/check" endpoint
 ![quality](https://raw.githubusercontent.com/afkar-gg/Roblox-Scripts/refs/heads/Readme-Assets/(Final)-Roblox-Joki-Proxy/Screenshot_2025_0708_001133_com.kiwibrowser.browser.png)
@@ -112,7 +112,7 @@ Here’s what you’ll see:
 - "/dashboard" endpoint
 ![sigma](https://raw.githubusercontent.com/afkar-gg/Roblox-Scripts/refs/heads/Readme-Assets/(Final)-Roblox-Joki-Proxy/Screenshot_2025_0708_001149_com.kiwibrowser.browser.png)
 
-📡 Discord Embed Example:
+### 📡 Discord Embed Example:
 
 - Start from /track
 ![deeznut](https://raw.githubusercontent.com/afkar-gg/Roblox-Scripts/refs/heads/Readme-Assets/(Final)-Roblox-Joki-Proxy/Screenshot_2025_0707_202342.png)
@@ -128,7 +128,7 @@ Here’s what you’ll see:
 
 ---
 
-🙏 Credits
+## 🙏 Credits
 
 @Afkar (Discord) Project idea, Roblox-side scripting, dashboard flow 💡
 
@@ -142,6 +142,6 @@ Cloudflare Tunnel	Zero-config HTTPS access 🌐
 
 ---
 
-💬 Support
+## 💬 Support
 
 If you want help or want to suggest features, feel free to DM Discord @afkar
