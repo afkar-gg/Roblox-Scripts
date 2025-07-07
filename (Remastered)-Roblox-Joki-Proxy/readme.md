@@ -106,6 +106,9 @@ Here’s what you’ll see:
 
 ### 🛠️ Dashboard Page:
 
+- Send embedded J*bId information from /send-job
+![iwiaiaj](https://raw.githubusercontent.com/afkar-gg/Roblox-Scripts/refs/heads/Readme-Assets/(Final)-Roblox-Joki-Proxy/Screenshot_2025_0708_003452.png)
+
 - "/check" endpoint
 ![quality](https://raw.githubusercontent.com/afkar-gg/Roblox-Scripts/refs/heads/Readme-Assets/(Final)-Roblox-Joki-Proxy/Screenshot_2025_0708_001133_com.kiwibrowser.browser.png)
 
