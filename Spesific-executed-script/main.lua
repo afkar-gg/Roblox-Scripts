@@ -3,11 +3,11 @@ GetService("TeleportService")
 
 local placeScripts = {
 [116495829188952] = function()
-script_key = "TqDokjuYYMVIuPOBmYZKjpWCrtnGRmiU"
-(loadstring or load)(game:HttpGet("https://getnative.cc/script/loader"))()
+    script_key = "TqDokjuYYMVIuPOBmYZKjpWCrtnGRmiU"
+    (loadstring or load)(game:HttpGet("https://getnative.cc/script/loader"))()
 end,
 
-[126884695634066] = function()  
+[126884695634066] = function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true))()  
 end,  
 
