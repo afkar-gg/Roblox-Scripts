@@ -1,5 +1,4 @@
-local TeleportServicegame:
-GetService("TeleportService")
+local TeleportService = game:GetService("TeleportService")
 
 local placeScripts = {
 [116495829188952] = function()
