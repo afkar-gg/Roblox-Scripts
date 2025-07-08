@@ -73,8 +73,7 @@ node index.js
 ```
 
 
-✅ After running, you’ll see a Cloudflare URL in the terminal — this is your public proxy link. Use this in the Roblox UI!
-
+✅ After running, you’ll see a command in the terminal at the bottom, you should copy that and paste it on another fresh terminal.
 
 ---
 
