@@ -61,9 +61,17 @@ pkg install nodejs git cloudflared -y && git clone https://github.com/afkar-gg/b
 4. Fill in config.json:
 ```bash
 {
-  "BOT_TOKEN": "your_discord_bot_token",
-  "CHANNEL_ID": "your_discord_channel_id",
-  "DASHBOARD_PASSWORD": "your_password"
+  // Example BOT TOKEN (get it from your bot application)
+  "BOT_TOKEN": "YOUR_DISCORD_BOT_TOKEN_HERE",
+
+  // Channel to send session notifications (start, complete, offline, etc.)
+  "CHANNEL_ID": "YOUR_SART_JOB_CHANNEL_ID",
+
+  // Channel where /send-job will post Job ID info
+  "JOB_CHANNEL_ID": "YOUR_JOBID_CHANNEL_ID",
+
+  // Dashboard login password (used at /login)
+  "DASHBOARD_PASSWORD": "changeme"
 }
 ```
 
