@@ -31,6 +31,7 @@ end,
 
 local runScript = placeScripts[game.PlaceId]
 if runScript then
+task.delay(12)
 runScript()
 else
 return
