@@ -32,7 +32,8 @@ end,
 
 local runScript = placeScripts[game.PlaceId]
 if runScript then
-runScript()
+    task.delay(8)
+    runScript()
 else
-return
+    return
 end
