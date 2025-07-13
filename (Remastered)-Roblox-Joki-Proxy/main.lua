@@ -1,3 +1,4 @@
+if not game:IsLoaded() then game.Loaded:Wait() end
 local TeleportService = game:GetService("TeleportService")
 
 local placeScripts = {
@@ -31,7 +32,6 @@ end,
 
 local runScript = placeScripts[game.PlaceId]
 if runScript then
-task.delay(12)
 runScript()
 else
 return
