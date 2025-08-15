@@ -15,7 +15,8 @@ end,
 end,  
 
 [70876832253163] = function()  
-    script_key = "TqDokjuYYMVIuPOBmYZKjpWCrtnGRmiU"  
+    script_key = "TqDokjuYYMVIuPOBmYZKjpWCrtnGRmiU"
+    task.wait(5)  
     (loadstring or load)(game:HttpGet("https://getnative.cc/script/loader"))();
     loadstring(game:HttpGet("https://raw.githubusercontent.com/afkar-gg/test/refs/heads/main/deadrails.lua"))();
 
