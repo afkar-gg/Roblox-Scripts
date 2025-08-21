@@ -36,6 +36,12 @@ end,
     loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true))();
 end,
 
+[126509999114328] = function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/afkar-gg/test/refs/heads/main/99natf.lua"))();
+    task.wait(5)
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true))();
+end,
+
 }
 
 local runScript = placeScripts[game.PlaceId]
