@@ -13,28 +13,28 @@ end,
 [96342491571673] = function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/afkar-gg/test/refs/heads/main/sab.lua"))();
     task.wait(5)
-    loadstring(game:HttpGet("https://get.nathub.xyz/loader"))();
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/ArdyBotzz/NatHub/refs/heads/master/NatHub.lua"))();
 end,
 
 -- Steal a Brainrot
 [109983668079237] = function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/afkar-gg/test/refs/heads/main/sab.lua"))();
     task.wait(5)
-    loadstring(game:HttpGet("https://get.nathub.xyz/loader"))();
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/ArdyBotzz/NatHub/refs/heads/master/NatHub.lua"))();
 end,
 
 -- 99 Nights In The Forest (Lobby)
 [79546208627805] = function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/afkar-gg/test/refs/heads/main/99natf.lua"))();
     task.wait(5)
-    loadstring(game:HttpGet("https://get.nathub.xyz/loader"))();
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/ArdyBotzz/NatHub/refs/heads/master/NatHub.lua"))();
 end,
 
 -- 99 Nights In The Forest (Game)
 [126509999114328] = function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/afkar-gg/test/refs/heads/main/99natf.lua"))();
     task.wait(5)
-    loadstring(game:HttpGet("https://get.nathub.xyz/loader"))();
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/ArdyBotzz/NatHub/refs/heads/master/NatHub.lua"))();
 end,
 
 -- Grow a Garden
