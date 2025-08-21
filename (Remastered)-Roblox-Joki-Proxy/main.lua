@@ -9,6 +9,13 @@ local placeScripts = {
     loadstring(game:HttpGet("https://raw.githubusercontent.com/afkar-gg/test/refs/heads/main/deadrails.lua"))();
 end,
 
+-- Steal a Brainrot (New Player)
+[96342491571673] = function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/afkar-gg/test/refs/heads/main/sab.lua"))();
+    task.wait(5)
+    loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/9a77cef9455a36ab545e0b157878e42d.lua"))()
+end,
+
 -- Steal a Brainrot
 [109983668079237] = function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/afkar-gg/test/refs/heads/main/sab.lua"))();
