@@ -25,6 +25,7 @@ end,
 
 -- 99 Nights In The Forest (Lobby)
 [79546208627805] = function()
+    task.wait(5)
     loadstring(game:HttpGet("https://get.nathub.xyz/loader"))();
     loadstring(game:HttpGet("https://raw.githubusercontent.com/afkar-gg/test/refs/heads/main/99natf.lua"))();
 
@@ -32,6 +33,7 @@ end,
 
 -- 99 Nights In The Forest (Game)
 [126509999114328] = function()
+    task.wait(5)
     loadstring(game:HttpGet("https://get.nathub.xyz/loader"))();
     loadstring(game:HttpGet("https://raw.githubusercontent.com/afkar-gg/test/refs/heads/main/99natf.lua"))();
 end,
@@ -64,7 +66,7 @@ end,
 
 local runScript = placeScripts[game.PlaceId]
 if runScript then
-    task.wait(5)
+    task.wait(2)
     runScript()
 else
     return
