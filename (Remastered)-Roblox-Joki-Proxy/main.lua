@@ -26,14 +26,16 @@ end,
 -- 99 Nights In The Forest (Lobby)
 [79546208627805] = function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/afkar-gg/test/refs/heads/main/99natf.lua"))();
-    task.wait(30)
-    loadstring(game:HttpGet('https://raw.githubusercontent.com/MQPS7/99-Night-in-the-Forset/refs/heads/main/Gfarm'))()
+    task.wait(0)
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/r4mpage4/LuaCom/refs/heads/main/saint.noob"))();
 
 end,
 
 -- 99 Nights In The Forest (Game)
 [126509999114328] = function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/afkar-gg/test/refs/heads/main/99natf.lua"))();
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/r4mpage4/LuaCom/refs/heads/main/saint.noob"))();
+
 end,
 
 -- Grow a Garden
