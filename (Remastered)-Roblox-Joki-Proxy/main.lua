@@ -26,7 +26,7 @@ end,
 -- 99 Nights In The Forest (Lobby)
 [79546208627805] = function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/afkar-gg/test/refs/heads/main/99natf.lua"))();
-   task.wait(1)
+    task.wait(1)
     loadstring(game:HttpGet("https://raw.githubusercontent.com/r4mpage4/LuaCom/refs/heads/main/saint.noob"))();
 
 end,
