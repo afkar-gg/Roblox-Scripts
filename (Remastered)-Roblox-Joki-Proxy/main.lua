@@ -25,7 +25,6 @@ end,
 
 -- 99 Nights In The Forest (Lobby)
 [79546208627805] = function()
-    task.wait(5)
     loadstring(game:HttpGet('https://raw.githubusercontent.com/MQPS7/99-Night-in-the-Forset/refs/heads/main/Gfarm'))()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/afkar-gg/test/refs/heads/main/99natf.lua"))();
 
@@ -33,7 +32,6 @@ end,
 
 -- 99 Nights In The Forest (Game)
 [126509999114328] = function()
-    task.wait(5)
     loadstring(game:HttpGet('https://raw.githubusercontent.com/MQPS7/99-Night-in-the-Forset/refs/heads/main/Gfarm'))()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/afkar-gg/test/refs/heads/main/99natf.lua"))();
 end,
