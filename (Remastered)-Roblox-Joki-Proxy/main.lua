@@ -34,6 +34,8 @@ end,
 -- 99 Nights In The Forest (Game)
 [126509999114328] = function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/afkar-gg/test/refs/heads/main/99natf.lua"))();
+    task.wait(30)
+    loadstring(game:HttpGet('https://raw.githubusercontent.com/MQPS7/99-Night-in-the-Forset/refs/heads/main/Gfarm'))()
 end,
 
 -- Grow a Garden
