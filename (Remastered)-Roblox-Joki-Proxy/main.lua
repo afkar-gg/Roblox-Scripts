@@ -27,7 +27,8 @@ end,
 [79546208627805] = function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/afkar-gg/test/refs/heads/main/99natf.lua"))();
     task.wait(30)
-    loadstring(game:HttpGet('https://raw.githubusercontent.com/MQPS7/99-Night-in-the-Forset/refs/heads/main/Gfarm'))()
+    getgenv().WebhookURL = "https://discord.com/api/webhooks/1390221900734533734/-zZqj8OROemNZ9iDolBbnxUdmXCAdKU8pF5x6ncwSBxzdKBWTI9HXRIil3EGVxaIAE6_"
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/caomod2077/Script/refs/heads/main/Farm%20Diamond%20v2.lua"))()
 
 end,
 
@@ -35,7 +36,8 @@ end,
 [126509999114328] = function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/afkar-gg/test/refs/heads/main/99natf.lua"))();
     task.wait(30)
-    loadstring(game:HttpGet('https://raw.githubusercontent.com/MQPS7/99-Night-in-the-Forset/refs/heads/main/Gfarm'))()
+    getgenv().WebhookURL = "https://discord.com/api/webhooks/1390221900734533734/-zZqj8OROemNZ9iDolBbnxUdmXCAdKU8pF5x6ncwSBxzdKBWTI9HXRIil3EGVxaIAE6_"
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/caomod2077/Script/refs/heads/main/Farm%20Diamond%20v2.lua"))()
 end,
 
 -- Grow a Garden
