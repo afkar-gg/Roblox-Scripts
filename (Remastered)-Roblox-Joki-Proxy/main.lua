@@ -47,6 +47,11 @@ end,
     loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true))();
 end,  
 
+-- Fish It (terpaksa nambah 🗿)
+[121864768012064] = function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/afkar-gg/test/refs/heads/main/gag.lua"))();
+    task.wait(5)
+
 -- Dead Rails (Game)
 [70876832253163] = function()  
     script_key = "TqDokjuYYMVIuPOBmYZKjpWCrtnGRmiU"
