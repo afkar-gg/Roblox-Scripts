@@ -51,6 +51,8 @@ end,
 [121864768012064] = function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/afkar-gg/test/refs/heads/main/gag.lua"))();
     task.wait(5)
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/mazino45/main/refs/heads/main/MainScript.lua"))()
+end,
 
 -- Dead Rails (Game)
 [70876832253163] = function()  
