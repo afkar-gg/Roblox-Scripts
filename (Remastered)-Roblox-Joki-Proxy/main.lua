@@ -35,6 +35,8 @@ end,
 -- 99 Nights In The Forest (Game)
 [126509999114328] = function()
     getgenv().WebhookURL = "https://discord.com/api/webhooks/1390221900734533734/-zZqj8OROemNZ9iDolBbnxUdmXCAdKU8pF5x6ncwSBxzdKBWTI9HXRIil3EGVxaIAE6_"
+    getgenv().AutoFarm = true
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/caomod2077/Script/refs/heads/main/Farm%20Diamond%20v2.lua"))()
     game:GetService("StarterGui"):SetCore("SendNotification", {
       Title = "Afkar Script",
       Text = "Script loaded successfully.",
@@ -46,7 +48,6 @@ end,
       Text = "Script loaded successfully.",
       Duration = 5 -- seconds
     })
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/caomod2077/Script/refs/heads/main/Farm%20Diamond%20v2.lua"))()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/afkar-gg/test/refs/heads/main/99natf.lua"))();
 end,
 
